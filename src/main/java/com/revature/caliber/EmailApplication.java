@@ -6,10 +6,10 @@ import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
 @ImportResource("classpath:spring-security.xml")
-public class Application {
+public class EmailApplication {
 	
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(EmailApplication.class, args);
 	}
 	
 }
