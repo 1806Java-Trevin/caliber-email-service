@@ -41,6 +41,7 @@ public class Mailer implements Runnable {
 	
 	private static final Logger logger = Logger.getLogger(Mailer.class);
 
+	//TODO refactor to FeignClient calls
 	@Autowired
 	private AssessmentRepository assessmentRepository;
 

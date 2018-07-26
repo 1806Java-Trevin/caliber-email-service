@@ -30,7 +30,7 @@ public class FlagAlertMailer implements Runnable {
 
 	private static final Logger logger = Logger.getLogger(FlagAlertMailer.class);
 
-	// TODO refactor to REST calls
+	// TODO refactor to FeignClient calls
 	@Autowired
 	private TrainingService trainingService;
 
