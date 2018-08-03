@@ -145,6 +145,33 @@ public class Mailer implements Runnable {
 		}
 	}
 	
+	
+	private void sendReminderEmail(Session session, Trainer trainerToSubmitGrades) {
+		logger.info("Trainer being sent emails: "+ trainerToSubmitGrades);
+		String emailTemplate = getEmailString();
+		if (emailTemplate == null) {
+			logger.warn("Unable to load email template, exiting sendEmails()");
+			return;
+		}	
+		try {
+			MimeMessage message = new MimeMessage(session);
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainer.getEmail()));
+			
+			message.setSubject("Submit Grades Reminder");
+			
+			// Parametrize the email to contain the name of the trainer being emailed
+			String emailStr = emailTemplate.replace(EMAIL_TEMPLATE_NAME_TOKEN, trainer.getName());
+			message.setContent(emailStr, "text/html");
+			
+			Transport.send(message);
+			logger.info("Email sent");
+		} catch (MessagingException e) {
+			logger.warn(e);
+			logger.warn("Email exception");
+		}
+	}
+	
+	
 	/**
 	 * Reads the email template located at EMAIL_TEMPLATE_PATH and returns a String
 	 * containing the contents of it
