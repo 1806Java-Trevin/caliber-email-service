@@ -1,5 +1,9 @@
 package com.revature.controller;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.Set;
 
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.caliber.beans.Trainer;
+import com.revature.caliber.email.EmailAuthenticator;
 import com.revature.caliber.services.TrainingService;
 
 /**
@@ -36,59 +41,51 @@ import com.revature.caliber.services.TrainingService;
 //@PreAuthorize("isAuthenticated()")
 //@CrossOrigin(origins = "http://ec2-54-163-132-124.compute-1.amazonaws.com")
 public class EmailController {
-
+	@Autowired
+	private TrainingService trainingService;
 	
 	@Autowired
-	TrainingService trainingService;
+	private EmailAuthenticator authenticator;
+
+	/*
+	 * email types below:
+	 * the email type maps to a template and each type is handled
+	 * individually by a method of this class
+	 */
+	private static final String TRAINER_GRADE_REMINDER = "trainerGradeReminder";
 	
+	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
 	
 	@RequestMapping(params= {"email_type"}, value = "/emails/{id}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 //	@PreAuthorize("hasAnyRole('VP', 'TRAINER')")
-	public ResponseEntity<Void> createAssessment( @PathVariable int trainerId, @RequestParam String email_type ) {
-//		log.debug("Creating assessment: " + assessment);
-//		assessmentService.save(assessment);
-		
-		Trainer t = trainingService.getTrainerById(trainerId);
-		if(t==null) {
-//			log.info("Invalid trainer ID");
-			System.out.println("Invalid trainer ID");
+	public ResponseEntity<Void> handleEmailRequests( @PathVariable int trainerId, @RequestParam String email_type ) {
+		Trainer trainerRecipient = trainingService.getTrainerById(trainerId);
+
+		if(trainerRecipient == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		if(email_type.equals("trainerGradeReiminder!?!@#")) {
-			sendTrainingReminder(t);
-		} else if (email_type.equals("vpBatchStatusReport!?!@#")) {
-			sendStatusReport(t);
-			
-		} else {
+		switch (email_type) {
+		case TRAINER_GRADE_REMINDER:
+			sendReminderEmail(trainerRecipient);
+			break;
+		case VP_BATCH_STATUS_REPORT:
+			sendStatusEmail(trainerRecipient);
+			break;
+		default:
 			return new ResponseEntity<>(HttpStatus.IM_USED);
 		}
-		
-		
+				
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-	
-	
-	private void sendTrainingReminder(Trainer trainerToBeSentToWithAGoodReminderEmail) {
-		Properties properties = setProperties();
-		Session session = getSession(properties);
-		sendReminderEmail(session, trainerToBeSentToWithAGoodReminderEmail);
-	}
-	private void sendStatusReport(Trainer trainerToBeSentToWithAGoodStatusEmail) {
-		Properties properties = setProperties();
-		Session session = getSession(properties);
-//		sendStatusEmail(session, trainerToBeSentToWithAGoodStatusEmail);
-	}
-	
-	
 
 	/**
 	 * Sets up the properties for the sending of emails
 	 * We use gmail's SMTP server
 	 * @return The properties for our email sending procedure
 	 */
-	private Properties setProperties() {
+	private Properties getProperties() {
 		Properties properties = new Properties();
 		properties.put("mail.smtp.host", "smtp.gmail.com");
 		properties.put("mail.smtp.socketFactory.port", "587");
@@ -98,45 +95,34 @@ public class EmailController {
 		properties.put("mail.smtp.starttls.enable", "true");
 		return properties;
 	}
+	
+	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
+		Session session = Session.getDefaultInstance(getProperties(), authenticator);
+		String emailContents = new String(Files.readAllBytes(Paths.get("emailTemplate.html")),StandardCharsets.UTF_8);
 
-	/**
-	 * Creates an email Session that can be used to send emails
-	 * @param properties The configuration for this session
-	 * @return A session used to send emails
-	 */
-	private Session getSession(Properties properties) {
-		return Session.getDefaultInstance(properties, authenticator);
+		MimeMessage message = new MimeMessage(session);
+		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
+
+		message.setSubject("Reminder: Submit Grades");
+
+		String emailStr = emailContents.replace("$TRAINER_NAME", trainerRecipient.getName());
+		message.setContent(emailStr, "text/html");
+
+		return message;
 	}
-
 	
-	
-	
-	private void sendReminderEmail(Session session, Trainer trainerToSubmitGrades) {
-		logger.info("Trainer being sent emails: "+ trainerToSubmitGrades);
-		String emailTemplate = getEmailString();
-		if (emailTemplate == null) {
-			logger.warn("Unable to load email template, exiting sendEmails()");
-			return;
-		}	
+	private void sendReminderEmail(Trainer trainerToSubmitGrades) {
 		try {
-			MimeMessage message = new MimeMessage(session);
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainer.getEmail()));
-			
-			message.setSubject("Submit Grades Reminder");
-			
-			// Parametrize the email to contain the name of the trainer being emailed
-			String emailStr = emailTemplate.replace(EMAIL_TEMPLATE_NAME_TOKEN, trainer.getName());
-			message.setContent(emailStr, "text/html");
-			
-			Transport.send(message);
-			logger.info("Email sent");
-		} catch (MessagingException e) {
-			logger.warn(e);
-			logger.warn("Email exception");
+			Message email = buildTrainerReminderEmail(trainerToSubmitGrades);
+			Transport.send(email);
+		}catch(IOException e) {
+			//TODO
+		}catch(MessagingException e) {
+			//TODO
 		}
 	}
 	
-	private void sendStatusEmail(Trainer t) {
+	private void sendStatusEmail(Trainer trainerRecipient) {
 		
 	}
 	
