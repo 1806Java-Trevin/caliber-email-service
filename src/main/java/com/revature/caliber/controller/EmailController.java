@@ -1,9 +1,10 @@
-package com.revature.controller;
+package com.revature.caliber.controller;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -27,7 +28,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.revature.caliber.beans.Trainee;
+import com.revature.caliber.beans.TraineeFlag;
 import com.revature.caliber.beans.Trainer;
+import com.revature.caliber.beans.TrainerRole;
+import com.revature.caliber.beans.TrainingStatus;
 import com.revature.caliber.email.EmailAuthenticator;
 import com.revature.caliber.services.TrainingService;
 
@@ -56,12 +61,14 @@ public class EmailController {
 	
 	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
 	
-	@RequestMapping(params= {"email_type"}, value = "/emails/{id}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	
+	@RequestMapping(params= {"email_type"}, value = "/emails/{id}", method = RequestMethod.POST)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 //	@PreAuthorize("hasAnyRole('VP', 'TRAINER')")
-	public ResponseEntity<Void> handleEmailRequests( @PathVariable int trainerId, @RequestParam String email_type ) {
+	public ResponseEntity<Void> handleEmailRequests( @PathVariable("id") int trainerId, @RequestParam("email_type") String email_type ) {
 		Trainer trainerRecipient = trainingService.getTrainerById(trainerId);
-
+		
+		//trainerRecipient = new Trainer("haha", "title", "kevinqkh@gmail.com", TrainerRole.ROLE_QC);
 		if(trainerRecipient == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
@@ -76,7 +83,7 @@ public class EmailController {
 		default:
 			return new ResponseEntity<>(HttpStatus.IM_USED);
 		}
-				
+
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
@@ -98,7 +105,7 @@ public class EmailController {
 	
 	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
-		String emailContents = new String(Files.readAllBytes(Paths.get("emailTemplate.html")),StandardCharsets.UTF_8);
+		String emailContents = new String(Files.readAllBytes(Paths.get("/Users/kevinqkh/Revature/Caliber/caliber-email-service/src/main/resources/emailTemplate.html")),StandardCharsets.UTF_8);
 
 		MimeMessage message = new MimeMessage(session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
@@ -111,19 +118,60 @@ public class EmailController {
 		return message;
 	}
 	
+	private Message buildStatusEmail(Trainer trainerRecipient) throws IOException, MessagingException {
+		Session session = Session.getDefaultInstance(getProperties(), authenticator);
+		String emailContents = new String(Files.readAllBytes(Paths.get("/Users/kevinqkh/Revature/Caliber/caliber-email-service/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
+
+		MimeMessage message = new MimeMessage(session);
+		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
+
+		message.setSubject("Batch Status");
+
+		String emailStr = emailContents.replace("$VP_NAME", trainerRecipient.getName());
+		List<Trainee> trainees = trainingService.getAllTrainees();
+		emailStr = emailContents.replace("$GREEN_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.GREEN, trainees));
+		emailStr = emailContents.replace("$RED_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.RED, trainees));
+		message.setContent(emailStr, "text/html");
+		
+
+		return message;
+	}
+	
+	public String getHTMLFlags(TraineeFlag flag, List<Trainee> trainees) {
+		String flagHTML = "";
+		for (Trainee trainee : trainees) {
+			if (trainee.getFlagStatus().equals(flag)) {
+				TrainingStatus ts = trainee.getTrainingStatus();
+				if (ts.equals(TrainingStatus.Training) || ts.equals(TrainingStatus.Marketing)) {
+					flagHTML += "<tr><td>" + trainee.getName() + "</td><td>" + trainee.getFlagNotes() + "</td></tr>";
+				}
+			}
+		}
+		return flagHTML;
+	}
+	
 	private void sendReminderEmail(Trainer trainerToSubmitGrades) {
 		try {
 			Message email = buildTrainerReminderEmail(trainerToSubmitGrades);
+			System.out.println(email);
 			Transport.send(email);
 		}catch(IOException e) {
-			//TODO
+			System.out.println("IOex");
 		}catch(MessagingException e) {
-			//TODO
+			System.out.println(e.getMessage());
 		}
 	}
 	
 	private void sendStatusEmail(Trainer trainerRecipient) {
-		
+		try {
+			Message email = buildStatusEmail(trainerRecipient);
+			System.out.println(email);
+			Transport.send(email);
+		}catch(IOException e) {
+			System.out.println("IOex");
+		}catch(MessagingException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 }

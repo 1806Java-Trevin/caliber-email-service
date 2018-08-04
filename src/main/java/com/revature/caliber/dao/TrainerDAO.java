@@ -1,4 +1,4 @@
-package com.revature.dao;
+package com.revature.caliber.dao;
 
 import java.util.List;
 
@@ -100,8 +100,8 @@ public class TrainerDAO {
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Trainer findOne(Integer trainerId) {
 		log.debug("Find trainer by id: " + trainerId);
-		return (Trainer) sessionFactory.getCurrentSession().createCriteria(Trainer.class)
-				.add(Restrictions.eq("trainerId", trainerId)).uniqueResult();
+		System.out.println("Find trainer by id: " + trainerId);
+		return sessionFactory.getCurrentSession().get(Trainer.class, trainerId);
 	}
 
 	/**
