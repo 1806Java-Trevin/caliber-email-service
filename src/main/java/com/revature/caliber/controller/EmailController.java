@@ -129,8 +129,8 @@ public class EmailController {
 
 		String emailStr = emailContents.replace("$VP_NAME", trainerRecipient.getName());
 		List<Trainee> trainees = trainingService.getAllTrainees();
-		emailStr = emailContents.replace("$GREEN_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.GREEN, trainees));
-		emailStr = emailContents.replace("$RED_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.RED, trainees));
+		emailStr = emailStr.replace("$GREEN_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.GREEN, trainees));
+		emailStr = emailStr.replace("$RED_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.RED, trainees));
 		message.setContent(emailStr, "text/html");
 		
 
