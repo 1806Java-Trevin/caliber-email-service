@@ -56,6 +56,10 @@ public class EmailController {
 	 * email types below:
 	 * the email type maps to a template and each type is handled
 	 * individually by a method of this class
+	 * 
+	 * example:  /emails/99?email_type=vpBatchStatusReport
+	 *  		99 is the trainer id to send the email to
+	 *  		email_type could be 'trainerGradeReminder' or 'vpBatchStatusReport'
 	 */
 	private static final String TRAINER_GRADE_REMINDER = "trainerGradeReminder";
 	
@@ -161,6 +165,7 @@ public class EmailController {
 			System.out.println(e.getMessage());
 		}
 	}
+	
 	
 	private void sendStatusEmail(Trainer trainerRecipient) {
 		try {
