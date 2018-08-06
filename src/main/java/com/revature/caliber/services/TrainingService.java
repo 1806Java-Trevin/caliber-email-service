@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.revature.caliber.beans.Trainer;
+import com.revature.caliber.beans.Batch;
 import com.revature.caliber.beans.Trainee;
+import com.revature.caliber.beans.Trainer;
+import com.revature.caliber.dao.BatchDAO;
 import com.revature.caliber.dao.TraineeDAO;
 import com.revature.caliber.dao.TrainerDAO;
 
@@ -28,12 +30,30 @@ public class TrainingService {
 	@Autowired
 	private TraineeDAO traineeDao;
 	
+	@Autowired
+	private BatchDAO batchDAO;
+	
 	
 	public Trainer getTrainerById(int trainerId) {
 		return trainerDao.findOne(trainerId);
 	}
 	
-	public List<Trainee> getAllTrainees() {
+	public List<Trainer> findAllTrainers(){
+		return trainerDao.findAll();
+	}
+	
+	public List<Trainee> findAllTrainees() {
 		return traineeDao.findAll();
 	}
+	
+	/**
+	 * FIND ALL BATCHES
+	 *
+	 * @return
+	 */
+	public List<Batch> findAllBatches() {
+//		log.debug("Find all batches");
+		return batchDAO.findAll();
+	}
+	
 }

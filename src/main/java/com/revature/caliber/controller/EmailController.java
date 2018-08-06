@@ -17,7 +17,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,9 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.revature.caliber.beans.Trainee;
 import com.revature.caliber.beans.TraineeFlag;
 import com.revature.caliber.beans.Trainer;
-import com.revature.caliber.beans.TrainerRole;
 import com.revature.caliber.beans.TrainingStatus;
 import com.revature.caliber.email.EmailAuthenticator;
+import com.revature.caliber.email.Mailer;
 import com.revature.caliber.services.TrainingService;
 
 /**
@@ -51,6 +50,9 @@ public class EmailController {
 	
 	@Autowired
 	private EmailAuthenticator authenticator;
+	
+	@Autowired
+	private Mailer mailer;
 
 	/*
 	 * email types below:
@@ -91,6 +93,17 @@ public class EmailController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
+	public void runReminderEmail() {
+		System.out.println("I am sending email now");
+		Set<Trainer> trainersToMail = mailer.getTrainersWhoNeedToSubmitGrades();
+		for(Trainer t: trainersToMail) {
+			// handleEmailRequests(t.getTrainerId(), "trainerGradeReminder");  // real one
+			handleEmailRequests(99, "trainerGradeReminder");  // this line for testing only
+		}
+		//loop
+//		sendReminderEmail(trainerRecipient);
+	}
+	
 	/**
 	 * Sets up the properties for the sending of emails
 	 * We use gmail's SMTP server
@@ -132,7 +145,7 @@ public class EmailController {
 		message.setSubject("Batch Status");
 
 		String emailStr = emailContents.replace("$VP_NAME", trainerRecipient.getName());
-		List<Trainee> trainees = trainingService.getAllTrainees();
+		List<Trainee> trainees = trainingService.findAllTrainees();
 		emailStr = emailStr.replace("$GREEN_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.GREEN, trainees));
 		emailStr = emailStr.replace("$RED_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.RED, trainees));
 		message.setContent(emailStr, "text/html");

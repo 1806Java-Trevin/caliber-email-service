@@ -1,4 +1,4 @@
-package com.revature.caliber.services;
+//package com.revature.caliber.services;
 //
 //import java.time.DayOfWeek;
 //import java.time.LocalDate;
@@ -19,8 +19,7 @@ package com.revature.caliber.services;
 //
 //@Service
 //public class FlagEmailService implements InitializingBean {
-public class FlagEmailService {
-
+//
 //		
 //		private static final Logger logger = Logger.getLogger(FlagEmailService.class);
 //
@@ -107,7 +106,6 @@ public class FlagEmailService {
 //			 */
 //			scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS);
 //		}
-
-	
-
-}
+//
+//	
+//}
