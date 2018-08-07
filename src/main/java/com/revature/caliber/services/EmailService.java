@@ -34,6 +34,8 @@ public class EmailService implements InitializingBean {
 	@Autowired
 	private Mailer mailer;
 	
+	private ScheduledFuture<?> mailHandle;
+	
 	/**
 	 * Used to schedule the actual firing of emails
 	 */
@@ -100,9 +102,7 @@ public class EmailService implements InitializingBean {
 		 * The method is synchronized for this reason, to prevent an edge case of it firing twice anyway
 		 * The issue stems from run() in Mailer being called twice, not sure why 
 		 */
-		if (started)
-			return;
-		started = true;
+		
 		
 		logger.info("startReminderJob()");
 		
@@ -130,8 +130,28 @@ public class EmailService implements InitializingBean {
 		 */
 		System.out.println(delayInUnits + " / " + TIME_UNITS_BETWEEN_EMAILS + " / " + TIME_UNITS);
 //		scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS);
-		final ScheduledFuture<?> mailHandle = scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS );
-//		final ScheduledFuture<?> mailHandle = scheduler.scheduleAtFixedRate(mailer, 15, 60, TimeUnit.SECONDS );
+		if(mailHandle != null) {
+			mailHandle.cancel(true);
+			mailHandle = scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS );
+		}
+		else {
+			mailHandle = scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS );
+		}
+	}
+	
+	public synchronized void startReminderJob(int delay, int interval) {
+		logger.info("startReminderJob()");
+		if(mailHandle != null) {
+			mailHandle.cancel(true);
+			mailHandle = scheduler.scheduleAtFixedRate(mailer, delay, TIME_UNITS_BETWEEN_EMAILS, TimeUnit.SECONDS );
+		}
+		else {
+			mailHandle = scheduler.scheduleAtFixedRate(mailer, delay, TIME_UNITS_BETWEEN_EMAILS, TimeUnit.SECONDS );
+		}
+	}
+	
+	public void cancelMail() {
+		mailHandle.cancel(true);
 	}
 
 }

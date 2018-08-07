@@ -32,6 +32,7 @@ import com.revature.caliber.beans.TraineeFlag;
 import com.revature.caliber.beans.Trainer;
 import com.revature.caliber.beans.TrainingStatus;
 import com.revature.caliber.email.EmailAuthenticator;
+import com.revature.caliber.email.FlagAlertMailer;
 import com.revature.caliber.email.Mailer;
 import com.revature.caliber.services.TrainingService;
 
@@ -54,6 +55,9 @@ public class EmailController {
 	@Autowired
 	private Mailer mailer;
 
+	@Autowired
+	private FlagAlertMailer flagMailer;
+
 	/*
 	 * email types below:
 	 * the email type maps to a template and each type is handled
@@ -66,6 +70,19 @@ public class EmailController {
 	private static final String TRAINER_GRADE_REMINDER = "trainerGradeReminder";
 	
 	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
+	
+	
+	//delay is in seconds?
+	//interval is in interval units?
+	@RequestMapping(params= {"email_type","delay", "interval", },  method=RequestMethod.POST)
+	public ResponseEntity<Void> handleScheduleEmail( @RequestParam("email_type") String email_type,
+			@RequestParam("delay") String delay, @RequestParam("interval") String interval) {
+		
+		
+		
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+	
 	
 	
 	@RequestMapping(params= {"email_type"}, value = "/emails/{id}", method = RequestMethod.POST)
@@ -94,15 +111,26 @@ public class EmailController {
 	}
 
 	public void runReminderEmail() {
-		System.out.println("I am sending email now");
+		System.out.println("I am sending reminder email now");
 		Set<Trainer> trainersToMail = mailer.getTrainersWhoNeedToSubmitGrades();
 		for(Trainer t: trainersToMail) {
-			// handleEmailRequests(t.getTrainerId(), "trainerGradeReminder");  // real one
-			handleEmailRequests(99, "trainerGradeReminder");  // this line for testing only
+			// handleEmailRequests(t.getTrainerId(), TRAINER_GRADE_REMINDER);  // real one
+			handleEmailRequests(99, TRAINER_GRADE_REMINDER);  // this line for testing only
 		}
 		//loop
 //		sendReminderEmail(trainerRecipient);
 	}
+	
+	public void runFlagEmail() {
+		System.out.println("I am sending flag email now");
+		Set<Trainer> trainersToMail = flagMailer.getVPs();
+		for(Trainer t: trainersToMail) {
+			// handleEmailRequests(t.getTrainerId(), VP_BATCH_STATUS_REPORT);  // real one
+			handleEmailRequests(99, VP_BATCH_STATUS_REPORT);  // this line for testing only
+			
+		}
+	}
+	
 	
 	/**
 	 * Sets up the properties for the sending of emails

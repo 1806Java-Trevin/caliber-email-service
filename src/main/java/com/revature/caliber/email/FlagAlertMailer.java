@@ -23,6 +23,7 @@ import com.revature.caliber.beans.TraineeFlag;
 import com.revature.caliber.beans.Trainer;
 import com.revature.caliber.beans.TrainerRole;
 import com.revature.caliber.beans.TrainingStatus;
+import com.revature.caliber.controller.EmailController;
 import com.revature.caliber.services.TrainingService;
 
 @Component
@@ -36,6 +37,9 @@ public class FlagAlertMailer implements Runnable{
 
 	@Autowired
 	private EmailAuthenticator authenticator;
+	
+	@Autowired
+	private EmailController emailController;
 
 	/**
 	 * The EMAIL TOKENs are tokens that are in the HTML file that will be
@@ -62,7 +66,7 @@ public class FlagAlertMailer implements Runnable{
 	 */
 	@Override
 	public void run() {
-		send();
+		emailController.runFlagEmail();
 	}
 
 	/**
