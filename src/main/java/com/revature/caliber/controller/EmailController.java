@@ -101,18 +101,13 @@ public class EmailController {
 		
 	}
 	
-	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(
-			@RequestBody MultiValueMap<String, String> formData) {
+	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.GET, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(@RequestParam("email_type") String email_type) {
 		
 //		 @RequestParam("email_type") String email_type,
 //			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
 		
-		for(String key: formData.keySet()) {
-			System.out.println(formData.get(key));
-		}
 		
-		String email_type = formData.getFirst("email_type");
 		if(email_type == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
