@@ -152,8 +152,15 @@ public class EmailController {
 		if(formData.getFirst("delay") == null || formData.getFirst("interval") == null ) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		int delay = Integer.parseInt(formData.getFirst("delay"));
-		int interval = Integer.parseInt(formData.getFirst("interval"));
+		int delay;
+		int interval;
+		try {
+			delay = Integer.parseInt(formData.getFirst("delay"));
+			interval = Integer.parseInt(formData.getFirst("interval"));
+		}
+		catch(NumberFormatException e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
