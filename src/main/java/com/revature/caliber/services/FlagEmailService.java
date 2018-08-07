@@ -28,6 +28,8 @@ public class FlagEmailService implements InitializingBean {
 		@Autowired
 		private FlagAlertMailer mailer;
 		
+		private ScheduledFuture<?> mailHandle;
+		
 		/**
 		 * Used to schedule the actual firing of emails
 		 */
@@ -47,12 +49,12 @@ public class FlagEmailService implements InitializingBean {
 		/**
 		 * The hour of the day during DAY_OF_WEEK_TO_FIRE at which to fire
 		 */
-		private static final int HOUR_TO_FIRE = 18; // hours go 0-23
+		private static final int HOUR_TO_FIRE = 9; // hours go 0-23
 		
 		/**
 		 * The minute of the HOUR_TO_FIRE to fire
 		 */
-		private static final int MINUTE_TO_FIRE = 00; // minutes go 0-59
+		private static final int MINUTE_TO_FIRE = 03; // minutes go 0-59
 		
 		/**
 		 * Number of days between emails, likely to stay 1 week/7 days
@@ -77,16 +79,13 @@ public class FlagEmailService implements InitializingBean {
 		 */
 		@Override
 		public void afterPropertiesSet(){
-			startFlagReminderJob();
+//			startFlagReminderJob();
 		}
 
 		private synchronized void startFlagReminderJob() {
 			/* 
 			 * Exits if we have already started the scheduled email job
 			 */
-			if (flagServiceStarted)
-				return;
-			flagServiceStarted = true;
 		
 			logger.info("startFlagReminderJob()");
 			
@@ -114,8 +113,30 @@ public class FlagEmailService implements InitializingBean {
 			 */
 			System.out.println(delayInUnits + " / " + TIME_UNITS_BETWEEN_EMAILS + " / " + TIME_UNITS);
 //			scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS);
-			final ScheduledFuture<?> mailHandle = scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS );
 //			final S
+			
+			if(mailHandle != null) {
+				mailHandle.cancel(true);
+				mailHandle = scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS );
+			}
+			else {
+				mailHandle = scheduler.scheduleAtFixedRate(mailer, delayInUnits, TIME_UNITS_BETWEEN_EMAILS, TIME_UNITS );
+			}
+		}
+		
+		public synchronized void startReminderJob(int delay, int interval) {
+			logger.info("startReminderJob()");
+			if(mailHandle != null) {
+				mailHandle.cancel(true);
+				mailHandle = scheduler.scheduleAtFixedRate(mailer, delay, interval, TimeUnit.SECONDS );
+			}
+			else {
+				mailHandle = scheduler.scheduleAtFixedRate(mailer, delay, interval, TimeUnit.SECONDS );
+			}
+		}
+		
+		public void cancelMail() {
+			mailHandle.cancel(true);
 		}
 
 	

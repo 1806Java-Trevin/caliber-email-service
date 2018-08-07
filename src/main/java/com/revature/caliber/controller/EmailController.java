@@ -17,11 +17,14 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +37,8 @@ import com.revature.caliber.beans.TrainingStatus;
 import com.revature.caliber.email.EmailAuthenticator;
 import com.revature.caliber.email.FlagAlertMailer;
 import com.revature.caliber.email.Mailer;
+import com.revature.caliber.services.EmailService;
+import com.revature.caliber.services.FlagEmailService;
 import com.revature.caliber.services.TrainingService;
 
 /**
@@ -57,6 +62,12 @@ public class EmailController {
 
 	@Autowired
 	private FlagAlertMailer flagMailer;
+	
+	@Autowired
+	private EmailService emailService;
+	
+	@Autowired
+	private FlagEmailService flagService;
 
 	/*
 	 * email types below:
@@ -74,18 +85,86 @@ public class EmailController {
 	
 	//delay is in seconds?
 	//interval is in interval units?
-	@RequestMapping(params= {"email_type","delay", "interval", },  method=RequestMethod.POST)
-	public ResponseEntity<Void> handleScheduleEmail( @RequestParam("email_type") String email_type,
-			@RequestParam("delay") String delay, @RequestParam("interval") String interval) {
+	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<Void> handleScheduleEmail(
+			@RequestBody MultiValueMap<String, String> formData) {
+		
+//		 @RequestParam("email_type") String email_type,
+//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
+		
+		for(String key: formData.keySet()) {
+			System.out.println(formData.get(key));
+		}
+		
+		String email_type = formData.getFirst("email_type");
+		if(email_type == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		if(formData.getFirst("delay") == null || formData.getFirst("interval") == null ) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		int delay = Integer.parseInt(formData.getFirst("delay"));
+		int interval = Integer.parseInt(formData.getFirst("interval"));
+		
+		switch (email_type) {
+		case TRAINER_GRADE_REMINDER:
+			if(interval <= 0) {
+				emailService.cancelMail();
+			}
+			else {
+				emailService.startReminderJob(delay, interval);
+			}
+			break;
+		case VP_BATCH_STATUS_REPORT:
+			if(interval <= 0) {
+				flagService.cancelMail();
+			}
+			else {
+				flagService.startReminderJob(delay, interval);
+			}
+			break;
+		default:
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+	
+	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<Void> handleGetScheduleEmail(
+			@RequestBody MultiValueMap<String, String> formData) {
+		
+//		 @RequestParam("email_type") String email_type,
+//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
+		
+		for(String key: formData.keySet()) {
+			System.out.println(formData.get(key));
+		}
+		
+		String email_type = formData.getFirst("email_type");
+		if(email_type == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		
 		
+		switch (email_type) {
+		case TRAINER_GRADE_REMINDER:
+			
+			break;
+		case VP_BATCH_STATUS_REPORT:
+			
+			break;
+		default:
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
 	
 	
-	@RequestMapping(params= {"email_type"}, value = "/emails/{id}", method = RequestMethod.POST)
+	
+	@RequestMapping(params= {"email_type"}, value = "/emails/send/{id}", method = RequestMethod.POST)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 //	@PreAuthorize("hasAnyRole('VP', 'TRAINER')")
 	public ResponseEntity<Void> handleEmailRequests( @PathVariable("id") int trainerId, @RequestParam("email_type") String email_type ) {
@@ -114,8 +193,10 @@ public class EmailController {
 		System.out.println("I am sending reminder email now");
 		Set<Trainer> trainersToMail = mailer.getTrainersWhoNeedToSubmitGrades();
 		for(Trainer t: trainersToMail) {
-			// handleEmailRequests(t.getTrainerId(), TRAINER_GRADE_REMINDER);  // real one
-			handleEmailRequests(99, TRAINER_GRADE_REMINDER);  // this line for testing only
+			System.out.println(t);
+			System.out.println(t.getEmail());
+			handleEmailRequests(t.getTrainerId(), TRAINER_GRADE_REMINDER);  // real one
+			// handleEmailRequests(99, TRAINER_GRADE_REMINDER);  // this line for testing only
 		}
 		//loop
 //		sendReminderEmail(trainerRecipient);
@@ -125,8 +206,10 @@ public class EmailController {
 		System.out.println("I am sending flag email now");
 		Set<Trainer> trainersToMail = flagMailer.getVPs();
 		for(Trainer t: trainersToMail) {
-			// handleEmailRequests(t.getTrainerId(), VP_BATCH_STATUS_REPORT);  // real one
-			handleEmailRequests(99, VP_BATCH_STATUS_REPORT);  // this line for testing only
+			System.out.println(t);
+			System.out.println(t.getEmail());
+			handleEmailRequests(t.getTrainerId(), VP_BATCH_STATUS_REPORT);  // real one
+			// handleEmailRequests(99, VP_BATCH_STATUS_REPORT);  // this line for testing only
 			
 		}
 	}
