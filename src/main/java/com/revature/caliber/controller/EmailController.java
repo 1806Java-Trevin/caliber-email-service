@@ -84,7 +84,7 @@ public class EmailController {
 	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
 	
 	
-	@RequestMapping( value = "/emails/getTrainers" ,method=RequestMethod.GET, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@RequestMapping( value = "/emails/getTrainers" ,method=RequestMethod.GET)
 	public ResponseEntity<Set<Trainer>> handleGetTrainers(@RequestParam("email_type") String email_type){
 		
 		
@@ -101,7 +101,7 @@ public class EmailController {
 		
 	}
 	
-	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.GET, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.GET)
 	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(@RequestParam("email_type") String email_type) {
 		
 //		 @RequestParam("email_type") String email_type,
