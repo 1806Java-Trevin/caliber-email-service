@@ -35,6 +35,7 @@ public class EmailService implements InitializingBean {
 	private Mailer mailer;
 	
 	private ScheduledFuture<?> mailHandle;
+	private int mailInterval;
 	
 	/**
 	 * Used to schedule the actual firing of emails
@@ -140,9 +141,11 @@ public class EmailService implements InitializingBean {
 	}
 	
 	public synchronized void startReminderJob(int delay, int interval) {
+		mailInterval = interval;
 		logger.info("startReminderJob()");
 		if(mailHandle != null) {
 			mailHandle.cancel(true);
+			
 			mailHandle = scheduler.scheduleAtFixedRate(mailer, delay, interval, TimeUnit.SECONDS );
 		}
 		else {
@@ -152,6 +155,16 @@ public class EmailService implements InitializingBean {
 	
 	public void cancelMail() {
 		mailHandle.cancel(true);
+		mailInterval = 0;
+	}
+	public int  getDelay() {
+		if(mailInterval == 0) {
+			return 0;
+		}
+		return (int)mailHandle.getDelay(TimeUnit.SECONDS);
+	}
+	public int getInterval() {
+		return mailInterval;
 	}
 
 }

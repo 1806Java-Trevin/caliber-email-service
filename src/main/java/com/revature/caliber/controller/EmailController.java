@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -83,10 +84,63 @@ public class EmailController {
 	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
 	
 	
+	@RequestMapping( value = "/emails/getTrainers" ,method=RequestMethod.GET, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<Set<Trainer>> handleGetTrainers(@RequestParam("email_type") String email_type){
+		
+		
+		switch (email_type) {
+		case TRAINER_GRADE_REMINDER:
+				Set<Trainer> trainers = mailer.getTrainersWhoNeedToSubmitGrades();
+				return new ResponseEntity<Set<Trainer>>(trainers, HttpStatus.CREATED);
+		case VP_BATCH_STATUS_REPORT:
+				Set<Trainer> trainers1 = flagMailer.getVPs();
+				return new ResponseEntity<Set<Trainer>>(trainers1, HttpStatus.CREATED);
+		default:
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+	
+	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(
+			@RequestBody MultiValueMap<String, String> formData) {
+		
+//		 @RequestParam("email_type") String email_type,
+//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
+		
+		for(String key: formData.keySet()) {
+			System.out.println(formData.get(key));
+		}
+		
+		String email_type = formData.getFirst("email_type");
+		if(email_type == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		switch (email_type) {
+		case TRAINER_GRADE_REMINDER:
+			
+			map.put("delay",  emailService.getDelay());
+
+			map.put("interval", emailService.getInterval());
+			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+		case VP_BATCH_STATUS_REPORT:
+
+			map.put("delay",  flagService.getDelay());
+
+			map.put("interval", flagService.getInterval());
+			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+		default:
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+	}
 	//delay is in seconds?
 	//interval is in interval units?
 	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Void> handleScheduleEmail(
+	public ResponseEntity<Set<Trainer>> handleScheduleEmail(
 			@RequestBody MultiValueMap<String, String> formData) {
 		
 //		 @RequestParam("email_type") String email_type,
@@ -122,37 +176,6 @@ public class EmailController {
 			else {
 				flagService.startReminderJob(delay, interval);
 			}
-			break;
-		default:
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		return new ResponseEntity<>(HttpStatus.CREATED);
-	}
-	
-	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Void> handleGetScheduleEmail(
-			@RequestBody MultiValueMap<String, String> formData) {
-		
-//		 @RequestParam("email_type") String email_type,
-//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
-		
-		for(String key: formData.keySet()) {
-			System.out.println(formData.get(key));
-		}
-		
-		String email_type = formData.getFirst("email_type");
-		if(email_type == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		
-		switch (email_type) {
-		case TRAINER_GRADE_REMINDER:
-			
-			break;
-		case VP_BATCH_STATUS_REPORT:
-			
 			break;
 		default:
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -271,7 +294,8 @@ public class EmailController {
 			if (trainee.getFlagStatus().equals(flag)) {
 				TrainingStatus ts = trainee.getTrainingStatus();
 				if (ts.equals(TrainingStatus.Training) || ts.equals(TrainingStatus.Marketing)) {
-					flagHTML += "<tr><td>" + trainee.getName() + "</td><td>" + trainee.getFlagNotes() + "</td></tr>";
+					String flagNote = (trainee.getFlagNotes()==null)? "N/A" : trainee.getFlagNotes(); //replace null with N/A
+					flagHTML += "<tr><td>" + trainee.getName() + "</td><td>" + flagNote + "</td></tr>";
 				}
 			}
 		}
