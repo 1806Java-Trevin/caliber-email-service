@@ -15,6 +15,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +51,7 @@ import com.revature.caliber.services.TrainingService;
  *
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 //@PreAuthorize("isAuthenticated()")
 //@CrossOrigin(origins = "http://ec2-54-163-132-124.compute-1.amazonaws.com")
 public class EmailController {
@@ -70,6 +73,14 @@ public class EmailController {
 	@Autowired
 	private FlagEmailService flagService;
 
+//	@Autowired
+//	private HttpServletResponse servletResponse;
+//	
+//	private void allowCrossDomainAccess() {
+//	    if (servletResponse != null) {
+//	        servletResponse.setHeader("Access-Control-Allow-Origin", "true");
+//	    }
+//	}
 	/*
 	 * email types below:
 	 * the email type maps to a template and each type is handled
@@ -83,10 +94,8 @@ public class EmailController {
 	
 	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
 	
-	
 	@RequestMapping( value = "/emails/getTrainers" ,method=RequestMethod.GET)
 	public ResponseEntity<Set<Trainer>> handleGetTrainers(@RequestParam("email_type") String email_type){
-		
 		
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
@@ -100,10 +109,9 @@ public class EmailController {
 		}
 		
 	}
-	
 	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.GET)
 	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(@RequestParam("email_type") String email_type) {
-		
+
 //		 @RequestParam("email_type") String email_type,
 //			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
 		
@@ -120,13 +128,13 @@ public class EmailController {
 			map.put("delay",  emailService.getDelay());
 
 			map.put("interval", emailService.getInterval());
-			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(map, HttpStatus.CREATED);
 		case VP_BATCH_STATUS_REPORT:
 
 			map.put("delay",  flagService.getDelay());
 
 			map.put("interval", flagService.getInterval());
-			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(map, HttpStatus.CREATED);
 		default:
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
