@@ -1,6 +1,9 @@
 # caliber-email-service
 Microservice that provides Email functionality for Caliber application
 
+# required environment variables
+CALIBER_CONFIG_REPO_URL
+
 # API endpoints
 
 ## /emails/getSchedule?email_type=[trainerGradeReminder, vpBatchStatusReport] <br />
