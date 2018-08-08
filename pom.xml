@@ -295,7 +295,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>caliber</finalName>
+		<finalName>caliber-email-service</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>
