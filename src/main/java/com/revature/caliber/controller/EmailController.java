@@ -1,5 +1,6 @@
 package com.revature.caliber.controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,8 +16,9 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,10 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -142,34 +142,44 @@ public class EmailController {
 	}
 	//delay is in seconds?
 	//interval is in interval units?
-	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Set<Trainer>> handleScheduleEmail(
-			@RequestBody MultiValueMap<String, String> formData) {
-		
+//	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.ALL_VALUE)
+	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmail(
+			HttpServletRequest req) {
+		// 	@RequestBody MultiValueMap<String, String> formData
+		System.out.println("I reached inside handle scheudle email");
 //		 @RequestParam("email_type") String email_type,
 //			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
 		
-		for(String key: formData.keySet()) {
-			System.out.println(formData.get(key));
-		}
-		
-		String email_type = formData.getFirst("email_type");
-		if(email_type == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		if(formData.getFirst("delay") == null || formData.getFirst("interval") == null ) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		int delay;
-		int interval;
-		try {
-			delay = Integer.parseInt(formData.getFirst("delay"));
-			interval = Integer.parseInt(formData.getFirst("interval"));
-		}
-		catch(NumberFormatException e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
+//		for(String key: formData.keySet()) {
+//			System.out.println(formData.get(key));
+//		}
+//		
+//		String email_type = formData.getFirst("email_type");
+//		if(email_type == null) {
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+//		if(formData.getFirst("delay") == null || formData.getFirst("interval") == null ) {
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+//		int delay;
+//		int interval;
+//		try {
+//			delay = Integer.parseInt(formData.getFirst("delay"));
+//			interval = Integer.parseInt(formData.getFirst("interval"));
+//		}
+//		catch(NumberFormatException e) {
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+		JSONObject obj = getObj(req);
+		String email_type = obj.getString("email_type");
+		System.out.println(email_type);
+		int interval = obj.getInt("interval");
+		int delay = obj.getInt("delay");
+		System.out.println(email_type + " " + interval + " " + delay);
+
+		HashMap<String, Integer> map =  new HashMap<String, Integer>();
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
 			if(interval <= 0) {
@@ -178,6 +188,8 @@ public class EmailController {
 			else {
 				emailService.startReminderJob(delay, interval);
 			}
+			map.put("delay", emailService.getDelay());
+			map.put("interval", emailService.getInterval());
 			break;
 		case VP_BATCH_STATUS_REPORT:
 			if(interval <= 0) {
@@ -186,12 +198,13 @@ public class EmailController {
 			else {
 				flagService.startReminderJob(delay, interval);
 			}
+			map.put("delay", flagService.getDelay());
+			map.put("interval", flagService.getInterval());
 			break;
 		default:
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<HashMap<String, Integer>>(HttpStatus.BAD_REQUEST);
 		}
-		
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		return new ResponseEntity<HashMap<String, Integer>>(map, HttpStatus.CREATED);
 	}
 	
 	
@@ -337,4 +350,22 @@ public class EmailController {
 		}
 	}
 	
+	public JSONObject getObj(HttpServletRequest req) {
+
+        StringBuffer jb = new StringBuffer();
+        String line = null;
+        try {
+            BufferedReader reader = req.getReader();
+            while ((line = reader.readLine()) != null)
+            jb.append(line);
+        } catch (Exception e) { e.printStackTrace(); }
+             
+        JSONObject obj = null;
+        try {
+            obj = new JSONObject(jb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
 }
