@@ -1,0 +1,17 @@
+>>in gitBash or powershell, go to the directory that you want to install the ojdbc7.jar in and
+>>then run the command below:
+mvn install:install-file -Dfile={Path/to/your/ojdbc7.jar} 
+      -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0 -Dpackaging=jar
+
+>>if any of your folders have "spaces" in their names, then you need to put your path/to/your/ojdbc.jar
+>>in quotes in the following command:
+mvn install:install-file -Dfile="{Path/to/your/ojdbc7.jar}"
+      -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0 -Dpackaging=jar
+
+>>add in pom.xml within <dependencies></dependencies>:
+        <!-- ojdbc7.jar example -->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc7</artifactId>
+            <version>12.1.0</version>
+        </dependency>
