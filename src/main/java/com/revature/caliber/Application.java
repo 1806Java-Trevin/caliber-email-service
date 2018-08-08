@@ -11,9 +11,14 @@ import org.springframework.context.annotation.ImportResource;
 @EnableEurekaClient
 @ImportResource("classpath:spring-security.xml")
 public class Application {
+	private String test = "Test";
 	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
+	}
+	
+	public String getTest() {
+		return test;
 	}
 	
 }
