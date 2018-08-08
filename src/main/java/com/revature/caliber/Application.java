@@ -10,7 +10,6 @@ import org.springframework.context.annotation.ImportResource;
 @EnableAutoConfiguration
 @EnableEurekaClient
 @ImportResource("classpath:spring-security.xml")
-@EnableEurekaClient
 public class Application {
 	
 	public static void main(String[] args) {
