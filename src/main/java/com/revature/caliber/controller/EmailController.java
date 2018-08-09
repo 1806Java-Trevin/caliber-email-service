@@ -83,7 +83,17 @@ public class EmailController {
 	
 	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
 	
-	
+	/**
+	 * Returns a set of trainers based on the type of email requester intends to send out
+	 * The email_type should refer to either the TRAINER_GRADE_REMINDER or VP_BATCH_STATUS_REPORT
+	 * final variable.
+	 * 
+	 * This method will a status error code if the email type requested is not one of the
+	 * accepted values.
+	 * 
+	 * @param email_type a string used to determine what trainer set to grab
+	 * @return A ResponseEntity containing the trainer set required
+	 */
 	@RequestMapping( value = "/emails/getTrainers" ,method=RequestMethod.GET)
 	public ResponseEntity<Set<Trainer>> handleGetTrainers(@RequestParam("email_type") String email_type){
 		
@@ -101,6 +111,14 @@ public class EmailController {
 		
 	}
 	
+	/**
+	 * Returns a map consisting of two elements, the delay timer for initial email trigger
+	 * and the interval between additional email triggers after the initial. This allows for
+	 * automated email reminders and alerts to be sent to trainers/VPs
+	 * 
+	 * @param email_type a string used to determine whether to get timers from email or flag
+	 * @return	A map consisting of 2 elements, one for delay, one for interval
+	 */
 	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.GET)
 	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(@RequestParam("email_type") String email_type) {
 		
@@ -132,6 +150,17 @@ public class EmailController {
 		}
 		
 	}
+	
+	/**
+	 * Parses formData to schedule emails or cancel scheduled emails. Returns a bad request status
+	 * error if any member of the form is invalid, being null or otherwise.
+	 * 
+	 * If the interval given in form data is 0 or negative, the scheduled email is cancelled. 
+	 * Otherwise an email is scheduled with the initial delay and interval set.
+	 * 
+	 * @param formData A used to hold form data from an input form
+	 * @return A status code representing the result of the request
+	 */
 	//delay is in seconds?
 	//interval is in interval units?
 	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -188,7 +217,17 @@ public class EmailController {
 	
 	
 	
-	
+	/**
+	 * Grabs the trainer id and email type from the request and calls a function to either
+	 * A) Send an email to remind a trainer to grade their associate
+	 * B) Report to VP on batch status
+	 * 
+	 * Returns a bad request if params are invalid.
+	 * 
+	 * @param trainerId Id of the trainer to send email too
+	 * @param email_type Type of email to send, between A or B
+	 * @return Returns a response code detailing if the request was successful
+	 */
 	@RequestMapping(params= {"email_type"}, value = "/emails/send/{id}", method = RequestMethod.POST)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 //	@PreAuthorize("hasAnyRole('VP', 'TRAINER')")
@@ -214,6 +253,10 @@ public class EmailController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
+	/**
+	 * Loops over set of trainers who have not submitted grades for their batch, and sends
+	 * reminder emails to those trainers via the handleEmailRequests method.
+	 */
 	public void runReminderEmail() {
 		System.out.println("I am sending reminder email now");
 		Set<Trainer> trainersToMail = mailer.getTrainersWhoNeedToSubmitGrades();
@@ -227,6 +270,9 @@ public class EmailController {
 //		sendReminderEmail(trainerRecipient);
 	}
 	
+	/**
+	 * Sends email reports on flags for batches to all VPs, using the handleEmailRequests method.
+	 */
 	public void runFlagEmail() {
 		System.out.println("I am sending flag email now");
 		Set<Trainer> trainersToMail = flagMailer.getVPs();
@@ -256,6 +302,17 @@ public class EmailController {
 		return properties;
 	}
 	
+	/**
+	 * Builds and returns an email message for the trainer given as a parameter, reminding
+	 * them to submit grades for their batch.
+	 * 
+	 * The message starts with the subject line, followed by the trainer's name. 
+	 * 
+	 * @param trainerRecipient the trainer to be emailed
+	 * @return the message to be sent in that particular email
+	 * @throws IOException
+	 * @throws MessagingException
+	 */
 	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
 		String emailContents = new String(Files.readAllBytes(Paths.get("/Users/kevinqkh/Revature/Caliber/caliber-email-service/src/main/resources/emailTemplate.html")),StandardCharsets.UTF_8);
@@ -271,6 +328,18 @@ public class EmailController {
 		return message;
 	}
 	
+	/**
+	 * Builds and returns an email message for a VP, displaying batch statuses.
+	 * 
+	 * Starts with subject line, followed by placing the name of the VP to be emailed at the top.
+	 * Then, the list of trainees with green flags is appended, followed by the list of trainees with
+	 * red flags. Finally the content type is set to HTML and the message is returned.
+	 * 
+	 * @param trainerRecipient the VP to be emailed
+	 * @return the message to be sent in the email
+	 * @throws IOException
+	 * @throws MessagingException
+	 */
 	private Message buildStatusEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
 		String emailContents = new String(Files.readAllBytes(Paths.get("/Users/kevinqkh/Revature/Caliber/caliber-email-service/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
@@ -290,6 +359,14 @@ public class EmailController {
 		return message;
 	}
 	
+	/**
+	 * Generates and returns a string consisting of all trainees, along with their flags and
+	 * any notes attached.
+	 * 
+	 * @param flag 
+	 * @param trainees
+	 * @return
+	 */
 	public String getHTMLFlags(TraineeFlag flag, List<Trainee> trainees) {
 		String flagHTML = "";
 		for (Trainee trainee : trainees) {
@@ -304,6 +381,12 @@ public class EmailController {
 		return flagHTML;
 	}
 	
+	/**
+	 * Calls the buildTrainerReminderEmail method to get the email object, then sends the email
+	 * built by that object.
+	 * 
+	 * @param trainerToSubmitGrades the trainer to receive an email.
+	 */
 	private void sendReminderEmail(Trainer trainerToSubmitGrades) {
 		try {
 			Message email = buildTrainerReminderEmail(trainerToSubmitGrades);
@@ -316,7 +399,12 @@ public class EmailController {
 		}
 	}
 	
-	
+	/**
+	 * Calls the buildStatusEmail method to get the email object, then sends the email built
+	 * by that object.
+	 * 
+	 * @param trainerRecipient the VP to receive the email.
+	 */
 	private void sendStatusEmail(Trainer trainerRecipient) {
 		try {
 			Message email = buildStatusEmail(trainerRecipient);
