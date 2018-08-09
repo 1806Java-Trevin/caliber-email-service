@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: caliber-email
+  cloud:
+    config:
+      uri: ${CALIBER_CONFIG_SERVER_URL}
+      fail-fast: true
