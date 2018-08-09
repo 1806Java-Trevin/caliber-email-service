@@ -280,7 +280,7 @@
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 			<version>1.4.3.RELEASE</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -327,6 +327,17 @@
 				<plugin>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
+					<configuration>
+						<mainClass>com.revature.caliber.Application.java</mainClass>
+						<addResources>true</addResources>
+					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
