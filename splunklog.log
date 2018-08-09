@@ -742,3 +742,4 @@ Caused by: oracle.net.ns.NetException: Got minus one from a read call
 	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1360)
 	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:486)
 	... 50 more
+INFO    2018-08-08 14:46:27,702 [background-preinit] org.hibernate.validator.internal.util.Version  - HV000001: Hibernate Validator 5.3.6.Final
