@@ -334,7 +334,7 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 					<configuration>
-						<mainClass>com.revature.caliber.Application.java</mainClass>
+						<mainClass>com.revature.caliber.Application</mainClass>
 						<addResources>true</addResources>
 					</configuration>
 					<executions>
