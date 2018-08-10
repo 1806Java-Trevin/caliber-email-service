@@ -52,126 +52,107 @@ import com.revature.caliber.services.TrainingService;
  */
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-//@PreAuthorize("isAuthenticated()")
-//@CrossOrigin(origins = "http://ec2-54-163-132-124.compute-1.amazonaws.com")
+// @PreAuthorize("isAuthenticated()")
+// @CrossOrigin(origins = "http://ec2-54-163-132-124.compute-1.amazonaws.com")
 public class EmailController {
 	@Autowired
 	private TrainingService trainingService;
-	
+
 	@Autowired
 	private EmailAuthenticator authenticator;
-	
+
 	@Autowired
 	private Mailer mailer;
 
 	@Autowired
 	private FlagAlertMailer flagMailer;
-	
+
 	@Autowired
 	private EmailService emailService;
-	
+
 	@Autowired
 	private FlagEmailService flagService;
 
-//	@Autowired
-//	private HttpServletResponse servletResponse;
-//	
-//	private void allowCrossDomainAccess() {
-//	    if (servletResponse != null) {
-//	        servletResponse.setHeader("Access-Control-Allow-Origin", "true");
-//	    }
-//	}
+	private String PATH_TO_RESOURCES = "C:\\Users\\Tylor Clemons\\Documents\\Project3_Git\\caliber-meta\\caliber-email-service\\src\\main\\resources";
+	// @Autowired
+	// private HttpServletResponse servletResponse;
+	//
+	// private void allowCrossDomainAccess() {
+	// if (servletResponse != null) {
+	// servletResponse.setHeader("Access-Control-Allow-Origin", "true");
+	// }
+	// }
 	/*
-	 * email types below:
-	 * the email type maps to a template and each type is handled
+	 * email types below: the email type maps to a template and each type is handled
 	 * individually by a method of this class
 	 * 
-	 * example:  /emails/99?email_type=vpBatchStatusReport
-	 *  		99 is the trainer id to send the email to
-	 *  		email_type could be 'trainerGradeReminder' or 'vpBatchStatusReport'
+	 * example: /emails/99?email_type=vpBatchStatusReport 99 is the trainer id to
+	 * send the email to email_type could be 'trainerGradeReminder' or
+	 * 'vpBatchStatusReport'
 	 */
 	private static final String TRAINER_GRADE_REMINDER = "trainerGradeReminder";
-	
+
 	private static final String VP_BATCH_STATUS_REPORT = "vpBatchStatusReport";
-	
-	@RequestMapping( value = "/emails/getTrainers" ,method=RequestMethod.GET)
-	public ResponseEntity<Set<Trainer>> handleGetTrainers(@RequestParam("email_type") String email_type){
-		
+
+	@RequestMapping(value = "/emails/getTrainers", method = RequestMethod.GET)
+	public ResponseEntity<Set<Trainer>> handleGetTrainers(@RequestParam("email_type") String email_type) {
+
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
-				Set<Trainer> trainers = mailer.getTrainersWhoNeedToSubmitGrades();
-				return new ResponseEntity<Set<Trainer>>(trainers, HttpStatus.CREATED);
+			Set<Trainer> trainers = mailer.getTrainersWhoNeedToSubmitGrades();
+			return new ResponseEntity<Set<Trainer>>(trainers, HttpStatus.CREATED);
 		case VP_BATCH_STATUS_REPORT:
-				Set<Trainer> trainers1 = flagMailer.getVPs();
-				return new ResponseEntity<Set<Trainer>>(trainers1, HttpStatus.CREATED);
+			Set<Trainer> trainers1 = flagMailer.getVPs();
+			return new ResponseEntity<Set<Trainer>>(trainers1, HttpStatus.CREATED);
 		default:
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
-	}
-	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.GET)
-	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(@RequestParam("email_type") String email_type) {
 
-//		 @RequestParam("email_type") String email_type,
-//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
-		
-		
-		if(email_type == null) {
+	}
+
+	@RequestMapping(value = "/emails/getSchedule", method = RequestMethod.GET)
+	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(
+			@RequestParam("email_type") String email_type) {
+
+		// @RequestParam("email_type") String email_type,
+		// @RequestParam("delay") String delay, @RequestParam("interval") String
+		// interval,
+
+		if (email_type == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
 
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
-			
-			map.put("delay",  emailService.getDelay());
+
+			map.put("delay", emailService.getDelay());
 
 			map.put("interval", emailService.getInterval());
 			return new ResponseEntity<>(map, HttpStatus.CREATED);
 		case VP_BATCH_STATUS_REPORT:
 
-			map.put("delay",  flagService.getDelay());
+			map.put("delay", flagService.getDelay());
 
 			map.put("interval", flagService.getInterval());
 			return new ResponseEntity<>(map, HttpStatus.CREATED);
 		default:
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
+
 	}
-	//delay is in seconds?
-	//interval is in interval units?
-//	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.ALL_VALUE)
-	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmail(
-			HttpServletRequest req) {
-		// 	@RequestBody MultiValueMap<String, String> formData
+
+	// delay is in seconds?
+	// interval is in interval units?
+	// @RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST,
+	// consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	// @RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST,
+	// consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/emails/startSchedule", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
+	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmail(HttpServletRequest req) {
+		// @RequestBody MultiValueMap<String, String> formData
 		System.out.println("I reached inside handle scheudle email");
-//		 @RequestParam("email_type") String email_type,
-//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
-		
-//		for(String key: formData.keySet()) {
-//			System.out.println(formData.get(key));
-//		}
-//		
-//		String email_type = formData.getFirst("email_type");
-//		if(email_type == null) {
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-//		if(formData.getFirst("delay") == null || formData.getFirst("interval") == null ) {
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-//		int delay;
-//		int interval;
-//		try {
-//			delay = Integer.parseInt(formData.getFirst("delay"));
-//			interval = Integer.parseInt(formData.getFirst("interval"));
-//		}
-//		catch(NumberFormatException e) {
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
+
 		JSONObject obj = getObj(req);
 		String email_type = obj.getString("email_type");
 		System.out.println(email_type);
@@ -179,23 +160,21 @@ public class EmailController {
 		int delay = obj.getInt("delay");
 		System.out.println(email_type + " " + interval + " " + delay);
 
-		HashMap<String, Integer> map =  new HashMap<String, Integer>();
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
-			if(interval <= 0) {
+			if (interval <= 0) {
 				emailService.cancelMail();
-			}
-			else {
+			} else {
 				emailService.startReminderJob(delay, interval);
 			}
 			map.put("delay", emailService.getDelay());
 			map.put("interval", emailService.getInterval());
 			break;
 		case VP_BATCH_STATUS_REPORT:
-			if(interval <= 0) {
+			if (interval <= 0) {
 				flagService.cancelMail();
-			}
-			else {
+			} else {
 				flagService.startReminderJob(delay, interval);
 			}
 			map.put("delay", flagService.getDelay());
@@ -206,21 +185,20 @@ public class EmailController {
 		}
 		return new ResponseEntity<HashMap<String, Integer>>(map, HttpStatus.CREATED);
 	}
-	
-	
-	
-	
-	@RequestMapping(params= {"email_type"}, value = "/emails/send/{id}", method = RequestMethod.POST)
+
+	@RequestMapping(params = { "email_type" }, value = "/emails/send/{id}", method = RequestMethod.POST)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-//	@PreAuthorize("hasAnyRole('VP', 'TRAINER')")
-	public ResponseEntity<Void> handleEmailRequests( @PathVariable("id") int trainerId, @RequestParam("email_type") String email_type ) {
+	// @PreAuthorize("hasAnyRole('VP', 'TRAINER')")
+	public ResponseEntity<Void> handleEmailRequests(@PathVariable("id") int trainerId,
+			@RequestParam("email_type") String email_type) {
 		Trainer trainerRecipient = trainingService.getTrainerById(trainerId);
-		
-		//trainerRecipient = new Trainer("haha", "title", "kevinqkh@gmail.com", TrainerRole.ROLE_QC);
-		if(trainerRecipient == null) {
+
+		// trainerRecipient = new Trainer("haha", "title", "kevinqkh@gmail.com",
+		// TrainerRole.ROLE_QC);
+		if (trainerRecipient == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
+
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
 			sendReminderEmail(trainerRecipient);
@@ -238,32 +216,33 @@ public class EmailController {
 	public void runReminderEmail() {
 		System.out.println("I am sending reminder email now");
 		Set<Trainer> trainersToMail = mailer.getTrainersWhoNeedToSubmitGrades();
-		for(Trainer t: trainersToMail) {
+		for (Trainer t : trainersToMail) {
 			System.out.println(t);
 			System.out.println(t.getEmail());
-			handleEmailRequests(t.getTrainerId(), TRAINER_GRADE_REMINDER);  // real one
-			// handleEmailRequests(99, TRAINER_GRADE_REMINDER);  // this line for testing only
+			handleEmailRequests(t.getTrainerId(), TRAINER_GRADE_REMINDER); // real one
+			// handleEmailRequests(99, TRAINER_GRADE_REMINDER); // this line for testing
+			// only
 		}
-		//loop
-//		sendReminderEmail(trainerRecipient);
+		// loop
+		// sendReminderEmail(trainerRecipient);
 	}
-	
+
 	public void runFlagEmail() {
 		System.out.println("I am sending flag email now");
 		Set<Trainer> trainersToMail = flagMailer.getVPs();
-		for(Trainer t: trainersToMail) {
+		for (Trainer t : trainersToMail) {
 			System.out.println(t);
 			System.out.println(t.getEmail());
-			handleEmailRequests(t.getTrainerId(), VP_BATCH_STATUS_REPORT);  // real one
-			// handleEmailRequests(99, VP_BATCH_STATUS_REPORT);  // this line for testing only
-			
+			handleEmailRequests(t.getTrainerId(), VP_BATCH_STATUS_REPORT); // real one
+			// handleEmailRequests(99, VP_BATCH_STATUS_REPORT); // this line for testing
+			// only
+
 		}
 	}
-	
-	
+
 	/**
-	 * Sets up the properties for the sending of emails
-	 * We use gmail's SMTP server
+	 * Sets up the properties for the sending of emails We use gmail's SMTP server
+	 * 
 	 * @return The properties for our email sending procedure
 	 */
 	private Properties getProperties() {
@@ -276,11 +255,17 @@ public class EmailController {
 		properties.put("mail.smtp.starttls.enable", "true");
 		return properties;
 	}
-	
-	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
-		Session session = Session.getDefaultInstance(getProperties(), authenticator);
-		String emailContents = new String(Files.readAllBytes(Paths.get("/Users/kevinqkh/Revature/Caliber/caliber-email-service/src/main/resources/emailTemplate.html")),StandardCharsets.UTF_8);
 
+	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
+		// System.out.println("#{systemEnvironment['PATH_TO_RESOURCES']}");
+//		System.out.println(System.getProperty("user.dir"));
+//		System.out.println(PATH_TO_RESOURCES + "\\emailTemplate.html");
+		Session session = Session.getDefaultInstance(getProperties(), authenticator);
+
+//		System.out.println("123: ");
+		String emailContents = new String(Files.readAllBytes(Paths.get(PATH_TO_RESOURCES + "\\emailTemplate.html")),
+				StandardCharsets.UTF_8);
+//		System.out.println("EMAILZ: " + emailContents);
 		MimeMessage message = new MimeMessage(session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
 
@@ -291,10 +276,12 @@ public class EmailController {
 
 		return message;
 	}
-	
+
 	private Message buildStatusEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
-		String emailContents = new String(Files.readAllBytes(Paths.get("/Users/kevinqkh/Revature/Caliber/caliber-email-service/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
+
+		String emailContents = new String(Files.readAllBytes(Paths.get(PATH_TO_RESOURCES + "/flagEmailTemplate.html")),
+				StandardCharsets.UTF_8);
 
 		MimeMessage message = new MimeMessage(session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
@@ -306,66 +293,67 @@ public class EmailController {
 		emailStr = emailStr.replace("$GREEN_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.GREEN, trainees));
 		emailStr = emailStr.replace("$RED_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.RED, trainees));
 		message.setContent(emailStr, "text/html");
-		
 
 		return message;
 	}
-	
+
 	public String getHTMLFlags(TraineeFlag flag, List<Trainee> trainees) {
 		String flagHTML = "";
 		for (Trainee trainee : trainees) {
 			if (trainee.getFlagStatus().equals(flag)) {
 				TrainingStatus ts = trainee.getTrainingStatus();
 				if (ts.equals(TrainingStatus.Training) || ts.equals(TrainingStatus.Marketing)) {
-					String flagNote = (trainee.getFlagNotes()==null)? "N/A" : trainee.getFlagNotes(); //replace null with N/A
+					String flagNote = (trainee.getFlagNotes() == null) ? "N/A" : trainee.getFlagNotes(); // replace null
+																											// with N/A
 					flagHTML += "<tr><td>" + trainee.getName() + "</td><td>" + flagNote + "</td></tr>";
 				}
 			}
 		}
 		return flagHTML;
 	}
-	
+
 	private void sendReminderEmail(Trainer trainerToSubmitGrades) {
 		try {
 			Message email = buildTrainerReminderEmail(trainerToSubmitGrades);
 			System.out.println(email);
 			Transport.send(email);
-		}catch(IOException e) {
+		} catch (IOException e) {
 			System.out.println("IOex");
-		}catch(MessagingException e) {
+		} catch (MessagingException e) {
 			System.out.println(e.getMessage());
 		}
 	}
-	
-	
+
 	private void sendStatusEmail(Trainer trainerRecipient) {
 		try {
 			Message email = buildStatusEmail(trainerRecipient);
 			System.out.println(email);
 			Transport.send(email);
-		}catch(IOException e) {
+		} catch (IOException e) {
 			System.out.println("IOex");
-		}catch(MessagingException e) {
+		} catch (MessagingException e) {
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	public JSONObject getObj(HttpServletRequest req) {
 
-        StringBuffer jb = new StringBuffer();
-        String line = null;
-        try {
-            BufferedReader reader = req.getReader();
-            while ((line = reader.readLine()) != null)
-            jb.append(line);
-        } catch (Exception e) { e.printStackTrace(); }
-             
-        JSONObject obj = null;
-        try {
-            obj = new JSONObject(jb.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return obj;
-    }
+		StringBuffer jb = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = req.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		JSONObject obj = null;
+		try {
+			obj = new JSONObject(jb.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return obj;
+	}
 }
