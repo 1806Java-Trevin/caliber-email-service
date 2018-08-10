@@ -54,7 +54,7 @@ import com.revature.caliber.services.TrainingService;
 @CrossOrigin(origins = "http://localhost:4200")
 // @PreAuthorize("isAuthenticated()")
 // @CrossOrigin(origins = "http://ec2-54-163-132-124.compute-1.amazonaws.com")
-public class EmailController {
+public class EmailController { 
 	@Autowired
 	private TrainingService trainingService;
 
