@@ -258,12 +258,12 @@ public class EmailController {
 
 	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		// System.out.println("#{systemEnvironment['PATH_TO_RESOURCES']}");
-//		System.out.println(System.getProperty("user.dir"));
+//		System.out.println(System.getProperty("user.dir") + "\\src\\main\\resources\\emailTemplate.html");
 //		System.out.println(PATH_TO_RESOURCES + "\\emailTemplate.html");
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
-
+		
 //		System.out.println("123: ");
-		String emailContents = new String(Files.readAllBytes(Paths.get(PATH_TO_RESOURCES + "\\emailTemplate.html")),
+		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\emailTemplate.html")),
 				StandardCharsets.UTF_8);
 //		System.out.println("EMAILZ: " + emailContents);
 		MimeMessage message = new MimeMessage(session);
@@ -280,7 +280,7 @@ public class EmailController {
 	private Message buildStatusEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
 
-		String emailContents = new String(Files.readAllBytes(Paths.get(PATH_TO_RESOURCES + "/flagEmailTemplate.html")),
+		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\flagEmailTemplate.html")),
 				StandardCharsets.UTF_8);
 
 		MimeMessage message = new MimeMessage(session);
