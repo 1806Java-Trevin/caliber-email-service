@@ -440,6 +440,12 @@ public class EmailController {
 		}
 	}
 	
+	/**
+	 * Renders request parameters as JSON object for ease of parsing.
+	 * 
+	 * @param req the request sent by the client
+	 * @return A JSONObject version of the passed in request.
+	 */
 	public JSONObject getObj(HttpServletRequest req) {
 
         StringBuffer jb = new StringBuffer();
