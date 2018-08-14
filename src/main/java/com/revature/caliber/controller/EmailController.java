@@ -340,7 +340,9 @@ public class EmailController {
 		System.out.println(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html" );
 //		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\emailTemplate.html")),
 //				StandardCharsets.UTF_8);
-		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html")),
+//		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html")),
+//				StandardCharsets.UTF_8);
+		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/classes/emailTemplate.html")),
 				StandardCharsets.UTF_8);
 
 		System.out.println(emailContents);
@@ -370,7 +372,8 @@ public class EmailController {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
 		System.out.println(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html" );
 //		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\flagEmailTemplate.html")),StandardCharsets.UTF_8);
-		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
+//		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
+		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/classes/flagEmailTemplate.html")),StandardCharsets.UTF_8);
 
 		System.out.println(emailContents);
 		MimeMessage message = new MimeMessage(session);
