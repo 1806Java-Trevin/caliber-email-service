@@ -307,7 +307,6 @@ public class EmailController {
 		}
 	}
 	
-	
 	/**
 	 * Sets up the properties for the sending of emails; we use gmail's SMTP server
 	 * 
