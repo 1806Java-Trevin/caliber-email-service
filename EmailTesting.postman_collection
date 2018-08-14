@@ -1,18 +1,19 @@
 {
 	"info": {
-		"_postman_id": "55628caa-1e4e-494f-b35f-e55622e5b31d",
+		"_postman_id": "206f8907-3b84-477c-96ca-1d372e65f840",
 		"name": "Caliber Email Testing",
 		"description": "This is testing for caliber email service.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Get Schedule",
+			"_postman_id": "9ac1ffe0-380a-4d82-ac10-fab46d0becf7",
+			"name": "Get Schedule (Grade)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "3e7bf615-c708-4a92-bf34-9e7003117089",
+						"id": "c6f7ca65-5f3f-4c22-a62e-6429632aa224",
 						"type": "text/javascript",
 						"exec": [
 							"const jsonData = pm.response.json();",
@@ -23,17 +24,12 @@
 							"",
 							"pm.test(\"Schedule has delay\", function () {",
 							"    pm.expect(jsonData).to.have.property('delay');",
-							"    //pm.expect(jsonData.interval).to.eql(0);",
 							"});",
 							"",
 							"pm.test(\"Schedule has interval\", function () {",
 							"    pm.expect(jsonData).to.have.property('interval');",
-							"    //pm.expect(jsonData.interval).to.eql(0);",
 							"});",
-							"",
-							"pm.test(\"Response time is less than 200ms\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(200);",
-							"});"
+							""
 						]
 					}
 				}
@@ -41,7 +37,10 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
 					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/getSchedule?email_type=trainerGradeReminder",
 					"host": [
@@ -66,6 +65,624 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"_postman_id": "4551ec61-65e8-4076-ba71-9bffb6ef6a2a",
+			"name": "Get Schedule (Bad Grade)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3dfd91c7-fb97-40c0-9ce7-20309b58e65b",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Response is bad\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/getSchedule?email_type=trainerGradeReminders",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"getSchedule"
+					],
+					"query": [
+						{
+							"key": "email_type",
+							"value": "trainerGradeReminders"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "098ab542-cbcf-4211-83a6-9a60f0efa902",
+			"name": "Get Schedule (Bad Vp)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e509016f-f9f8-42df-918a-bc433c8656b2",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Response is bad\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/getSchedule?email_type=vpBatchStatusReports",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"getSchedule"
+					],
+					"query": [
+						{
+							"key": "email_type",
+							"value": "vpBatchStatusReports"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "54c5e865-8a15-4d32-ba94-e89d9531bb94",
+			"name": "Get Schedule (Vp)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b000d1c6-ec74-4c47-99c6-4296640e58a6",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Schedule has delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay');",
+							"});",
+							"",
+							"pm.test(\"Schedule has interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval');",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/getSchedule?email_type=vpBatchStatusReport",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"getSchedule"
+					],
+					"query": [
+						{
+							"key": "email_type",
+							"value": "vpBatchStatusReport"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "6550d948-9a93-467d-82f6-ff89c9468598",
+			"name": "Get Trainers (Grade)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ebff49bd-6a49-4178-b3ec-4a32d88ab91a",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Has a trainer trainerId\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"trainerId\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/getTrainers?email_type=trainerGradeReminder",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"getTrainers"
+					],
+					"query": [
+						{
+							"key": "email_type",
+							"value": "trainerGradeReminder"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "b1a81347-33e1-4faa-8b4d-d4286aefd830",
+			"name": "Get Trainers (Vp)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "855ed792-77a1-40c2-a616-e7c25ddfacad",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Has a trainer trainerId\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"trainerId\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/getTrainers?email_type=vpBatchStatusReport",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"getTrainers"
+					],
+					"query": [
+						{
+							"key": "email_type",
+							"value": "vpBatchStatusReport"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "27a123bd-1051-47e6-a71c-3a06edc9fd1f",
+			"name": "Set Schedule (Vp)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "464218de-2465-4a70-b2cc-d4a955512000",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Schedule has delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 5005 delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay').to.be.below(5006);",
+							"    pm.expect(jsonData).to.have.property('delay').to.be.above(4000);",
+							"});",
+							"",
+							"pm.test(\"Schedule has interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 5005 interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval').to.be.equal(5000);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email_type",
+							"value": "vpBatchStatusReport",
+							"sessionValue": "vpBatchStatusReport",
+							"type": "text"
+						},
+						{
+							"key": "delay",
+							"value": "5005",
+							"sessionValue": "180",
+							"type": "text"
+						},
+						{
+							"key": "interval",
+							"value": "5000",
+							"sessionValue": "5000",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/startScheduleForm",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"startScheduleForm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "02730c07-73ec-4095-8852-3fce4bc4d991",
+			"name": "Cancel Schedule (Vp)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d44f0103-e7bb-4d57-9afd-86c8e5b663cd",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Schedule has delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 0 delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay').to.be.equal(0);",
+							"});",
+							"",
+							"pm.test(\"Schedule has interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 0 interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval').to.be.equal(0);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email_type",
+							"value": "vpBatchStatusReport",
+							"sessionValue": "vpBatchStatusReport",
+							"type": "text"
+						},
+						{
+							"key": "delay",
+							"value": "5005",
+							"sessionValue": "180",
+							"type": "text"
+						},
+						{
+							"key": "interval",
+							"value": "0",
+							"sessionValue": "5000",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/startScheduleForm",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"startScheduleForm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "48e4e3d4-da33-4e9f-82ad-2ecb1df4b76b",
+			"name": "Set Schedule (Grade)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "46276f4c-9d06-4dc4-b665-a49dc0747256",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Schedule has delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 5005 delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay').to.be.below(5006);",
+							"    pm.expect(jsonData).to.have.property('delay').to.be.above(4000);",
+							"});",
+							"",
+							"pm.test(\"Schedule has interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 5005 interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval').to.be.equal(5000);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email_type",
+							"value": "trainerGradeReminder",
+							"sessionValue": "vpBatchStatusReport",
+							"type": "text"
+						},
+						{
+							"key": "delay",
+							"value": "5005",
+							"sessionValue": "180",
+							"type": "text"
+						},
+						{
+							"key": "interval",
+							"value": "5000",
+							"sessionValue": "5000",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/startScheduleForm",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"startScheduleForm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"_postman_id": "a8ca224d-1086-4291-ad53-1db005eee4b8",
+			"name": "Cancel Schedule (Grade)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "de68d234-1ec9-466b-b191-4f22ded938e3",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Schedule has delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 0 delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay').to.be.equal(0);",
+							"});",
+							"",
+							"pm.test(\"Schedule has interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval');",
+							"});",
+							"",
+							"pm.test(\"Schedule has 0 interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval').to.be.equal(0);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email_type",
+							"value": "trainerGradeReminder",
+							"sessionValue": "vpBatchStatusReport",
+							"type": "text"
+						},
+						{
+							"key": "delay",
+							"value": "5005",
+							"sessionValue": "180",
+							"type": "text"
+						},
+						{
+							"key": "interval",
+							"value": "0",
+							"sessionValue": "5000",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/startScheduleForm",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"startScheduleForm"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
@@ -85,7 +702,7 @@
 				"id": "630124a2-6963-4f17-ae66-82cc3e6c935f",
 				"type": "text/javascript",
 				"exec": [
-					"console.log(\"hello1\")"
+					""
 				]
 			}
 		}
