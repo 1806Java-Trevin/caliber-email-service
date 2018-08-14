@@ -344,6 +344,7 @@ public class EmailController {
 //				StandardCharsets.UTF_8);
 		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "src/main/resources/emailTemplate.html")),
 				StandardCharsets.UTF_8);
+		
 
 		System.out.println(emailContents);
 		MimeMessage message = new MimeMessage(session);
@@ -425,6 +426,8 @@ public class EmailController {
 			System.out.println("Unable to find html template");
 			//unable to find html template
 		} catch (MessagingException e) {
+			System.out.println("Unable to send email");
+			e.printStackTrace();
 			//failure to send email
 		}
 	}
