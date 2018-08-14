@@ -45,7 +45,6 @@ public class Logging {
 	@AfterReturning("execution(* com.revature.caliber.dao.AssessmentDAO.save(..))")
 	public void AssessmentDAOSave(JoinPoint point)
 	{
-		System.out.println("In the assessment save");
 		Object [] argList;
 		argList = point.getArgs();
 		Assessment obj = (Assessment) argList[0];
@@ -545,10 +544,9 @@ public class Logging {
 		EmailControllerlog.error("Reminder sending status email");
 	}
 	
-	@After("execution(* *(..))")
+	@After("execution(* com.revature.caliber.controller.EmailController.handleGetTrainers(..))")
 	public void EmailControllerHandleGetTrainers(JoinPoint point)
 	{
-		System.out.println("In the get trainers aspect");
 		EmailControllerlog.debug("Requested URI: /emails/getTrainers");
 	}
 	
