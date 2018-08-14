@@ -6,5 +6,5 @@ spring:
     name: caliber-email
   cloud:
     config:
-      uri: http://localhost:8888
+      uri: ${CALIBER_CONFIG_SERVER_URL}
       fail-fast: true
