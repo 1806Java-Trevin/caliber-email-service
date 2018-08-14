@@ -337,13 +337,13 @@ public class EmailController {
 	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
 
-//		System.out.println(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html" );
+		System.out.println(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html" );
 //		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\emailTemplate.html")),
 //				StandardCharsets.UTF_8);
 		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html")),
 				StandardCharsets.UTF_8);
 
-//		System.out.println(emailContents);
+		System.out.println(emailContents);
 		MimeMessage message = new MimeMessage(session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
 
@@ -368,11 +368,11 @@ public class EmailController {
 	 */
 	private Message buildStatusEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
-//		System.out.println(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html" );
+		System.out.println(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html" );
 //		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\flagEmailTemplate.html")),StandardCharsets.UTF_8);
 		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
 
-//		System.out.println(emailContents);
+		System.out.println(emailContents);
 		MimeMessage message = new MimeMessage(session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
 
