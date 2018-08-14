@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -147,6 +148,19 @@ public class EmailController {
 		}
 	}
 
+	/**
+	 * FOR ACTUAL APPLICATION:
+	 * 
+	 * Schedules an email to be sent based on data from an input form. Gets the email type string,
+	 * interval integer, and delay integer from the request. Then, depending on what email type was
+	 * requested in the form, schedules either reminders for trainers who have not completed the
+	 * grading of their trainees OR a status report of all batches to the VPs.
+	 * 
+	 * Integer values equal to or lesser than 0 for interval will result in an email cancellation.
+	 * 
+	 * @param req The request containing the form data to be read into local variables
+	 * @return A response entity containing either the delay and interval OR a status code in case of error
+	 */
 	@RequestMapping(value = "/emails/startSchedule", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
 	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmail(HttpServletRequest req) {
 
@@ -182,9 +196,61 @@ public class EmailController {
 		}
 		return new ResponseEntity<HashMap<String, Integer>>(map, HttpStatus.CREATED);
 	}
-	
-	
-	
+
+	/**
+	 * FOR TESTING PURPOSES:
+	 * 
+	 * Schedules an email to be sent based on data from an input form. Gets the email type string,
+	 * interval integer, and delay integer from the request. Then, depending on what email type was
+	 * requested in the form, schedules either reminders for trainers who have not completed the
+	 * grading of their trainees OR a status report of all batches to the VPs.
+	 * 
+	 * Integer values equal to or lesser than 0 for interval will result in an email cancellation.
+	 * 
+	 * @param req The request containing the form data to be read into local variables
+	 * @return A response entity containing either the delay and interval OR a status code in case of error
+	 */
+	@RequestMapping(value = "/emails/startScheduleForm", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmailForm(@RequestParam Map<String,String> req) {
+		// @RequestBody MultiValueMap<String, String> formData
+		System.out.println("I reached inside handle scheudle email form");
+
+		if( !req.containsKey("email_type") || !req.containsKey("delay") || !req.containsKey("interval")  ) {
+			return new ResponseEntity<HashMap<String, Integer>>(HttpStatus.BAD_REQUEST);
+		}
+		
+		String email_type = req.get("email_type");
+		System.out.println(email_type);
+		int interval = Integer.parseInt(req.get("interval"));
+		int delay = Integer.parseInt(req.get("delay"));
+		System.out.println(email_type + " " + interval + " " + delay);
+
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		switch (email_type) {
+		case TRAINER_GRADE_REMINDER:
+			if (interval <= 0) {
+				emailService.cancelMail();
+			} else {
+				emailService.startReminderJob(delay, interval);
+			}
+			map.put("delay", emailService.getDelay());
+			map.put("interval", emailService.getInterval());
+			break;
+		case VP_BATCH_STATUS_REPORT:
+			if (interval <= 0) {
+				flagService.cancelMail();
+			} else {
+				flagService.startReminderJob(delay, interval);
+			}
+			map.put("delay", flagService.getDelay());
+			map.put("interval", flagService.getInterval());
+			break;
+		default:
+			return new ResponseEntity<HashMap<String, Integer>>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<HashMap<String, Integer>>(map, HttpStatus.CREATED);
+	}
+
 	/**
 	 * Grabs the trainer id and email type from the request and calls a function to either
 	 * A) Send an email to remind a trainer to grade their associate
@@ -196,7 +262,7 @@ public class EmailController {
 	 * @param email_type Type of email to send, between A or B
 	 * @return Returns a response code detailing if the request was successful
 	 */
-	@RequestMapping(params= {"email_type"}, value = "/emails/send/{id}", method = RequestMethod.POST)
+	@RequestMapping(params = { "email_type" }, value = "/emails/send/{id}", method = RequestMethod.POST)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public ResponseEntity<Void> handleEmailRequests(@PathVariable("id") int trainerId,
 			@RequestParam("email_type") String email_type) {
