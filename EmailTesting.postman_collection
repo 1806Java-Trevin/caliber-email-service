@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "55628caa-1e4e-494f-b35f-e55622e5b31d",
+		"name": "Caliber Email Testing",
+		"description": "This is testing for caliber email service.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Schedule",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e7bf615-c708-4a92-bf34-9e7003117089",
+						"type": "text/javascript",
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Response is ok\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Schedule has delay\", function () {",
+							"    pm.expect(jsonData).to.have.property('delay');",
+							"    //pm.expect(jsonData.interval).to.eql(0);",
+							"});",
+							"",
+							"pm.test(\"Schedule has interval\", function () {",
+							"    pm.expect(jsonData).to.have.property('interval');",
+							"    //pm.expect(jsonData.interval).to.eql(0);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "ec2-18-221-11-133.us-east-2.compute.amazonaws.com:9999/caliber-email/emails/getSchedule?email_type=trainerGradeReminder",
+					"host": [
+						"ec2-18-221-11-133",
+						"us-east-2",
+						"compute",
+						"amazonaws",
+						"com"
+					],
+					"port": "9999",
+					"path": [
+						"caliber-email",
+						"emails",
+						"getSchedule"
+					],
+					"query": [
+						{
+							"key": "email_type",
+							"value": "trainerGradeReminder"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "0b974282-12c7-4af8-8410-89b0890ea0d6",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "630124a2-6963-4f17-ae66-82cc3e6c935f",
+				"type": "text/javascript",
+				"exec": [
+					"console.log(\"hello1\")"
+				]
+			}
+		}
+	]
+}
