@@ -23,7 +23,6 @@ import com.revature.caliber.dao.TrainerDAO;
 @Service
 public class TrainingService {
 
-	
 	@Autowired
 	private TrainerDAO trainerDao;
 	
@@ -52,7 +51,6 @@ public class TrainingService {
 	 * @return
 	 */
 	public List<Batch> findAllBatches() {
-//		log.debug("Find all batches");
 		return batchDAO.findAll();
 	}
 	

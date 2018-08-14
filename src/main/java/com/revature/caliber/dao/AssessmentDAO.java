@@ -25,7 +25,7 @@ import com.revature.caliber.beans.TrainingStatus;
 @Repository
 public class AssessmentDAO {
 
-	private static final Logger log = Logger.getLogger(AssessmentDAO.class);
+	//private static final Logger log = Logger.getLogger(AssessmentDAO.class);
 	private SessionFactory sessionFactory;
 	private static final String BATCH = "batch";
 
@@ -36,20 +36,20 @@ public class AssessmentDAO {
 
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void save(Assessment assessment) {
-		log.debug("Saving assessment " + assessment);
+		//log.debug("Saving assessment " + assessment);
 		sessionFactory.getCurrentSession().save(assessment);
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Assessment findOne(long id) {
-		log.debug("Finding one assessment " + id);
+		//log.debug("Finding one assessment " + id);
 		return (Assessment) sessionFactory.getCurrentSession().get(Assessment.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Assessment> findAll() {
-		log.debug("Find all assessment");
+		//log.debug("Find all assessment");
 		return sessionFactory.getCurrentSession().createCriteria(Assessment.class)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
 	}
@@ -57,7 +57,7 @@ public class AssessmentDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Assessment> findByWeek(Integer batchId, Integer week) {
-		log.debug("Find assessment by week number " + week + " for batch " + batchId + " ");
+		//log.debug("Find assessment by week number " + week + " for batch " + batchId + " ");
 		return sessionFactory.getCurrentSession().createCriteria(Assessment.class)
 				.createAlias(BATCH, BATCH).createAlias("batch.trainees", "t", JoinType.LEFT_OUTER_JOIN)
 				.add(Restrictions.ne("t.trainingStatus", TrainingStatus.Dropped))
@@ -70,7 +70,7 @@ public class AssessmentDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Assessment> findByBatchId(Integer batchId) {
-		log.debug("Find assessment by batchId" + batchId + " ");
+		//log.debug("Find assessment by batchId" + batchId + " ");
 		return sessionFactory.getCurrentSession().createCriteria(Assessment.class)
 				.createAlias(BATCH, "b", JoinType.LEFT_OUTER_JOIN)
 				.createAlias("b.trainees", "t", JoinType.LEFT_OUTER_JOIN)
@@ -81,13 +81,13 @@ public class AssessmentDAO {
 
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void update(Assessment assessment) {
-		log.debug("Updating assessment " + assessment + "  IN THE DAO");
+		//log.debug("Updating assessment " + assessment + "  IN THE DAO");
 		sessionFactory.getCurrentSession().update(assessment);
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void delete(Assessment assessment) {
-		log.debug("Deleting assessment " + assessment);
+		//log.debug("Deleting assessment " + assessment);
 		sessionFactory.getCurrentSession().delete(assessment);
 	}	
 }

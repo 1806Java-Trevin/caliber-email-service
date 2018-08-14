@@ -25,7 +25,7 @@ import com.revature.caliber.beans.TrainingStatus;
 @Repository
 public class TraineeDAO {
 
-	private static final Logger log = Logger.getLogger(TraineeDAO.class);
+	//private static final Logger log = Logger.getLogger(TraineeDAO.class);
 	private SessionFactory sessionFactory;
 	private static final String GRADES = "grades";
 	private static final String TRAINING_STATUS = "trainingStatus";
@@ -43,7 +43,7 @@ public class TraineeDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void save(Trainee trainee) {
-		log.debug("Saving trainee " + trainee);
+		//log.debug("Saving trainee " + trainee);
 		sessionFactory.getCurrentSession().save(trainee);
 	}
 
@@ -55,7 +55,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findAll() {
-		log.debug("Fetching all trainees");
+		//log.debug("Fetching all trainees");
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
 	}
@@ -68,7 +68,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findAllNotDropped() {
-		log.debug("Fetching all trainees");
+		//log.debug("Fetching all trainees");
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.add(Restrictions.ne(TRAINING_STATUS, TrainingStatus.Dropped))
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
@@ -83,7 +83,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findAllByBatch(Integer batchId) {
-		log.debug("Fetching all Active trainees by batch: " + batchId);
+		//log.debug("Fetching all Active trainees by batch: " + batchId);
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.createAlias(GRADES, "g", JoinType.LEFT_OUTER_JOIN).add(Restrictions.gt("g.score", 0.0))
 				.add(Restrictions.eq("batch.batchId", batchId))
@@ -100,7 +100,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findAllDroppedByBatch(Integer batchId) {
-		log.debug("Fetching all Dropped trainees by batch: " + batchId);
+		//log.debug("Fetching all Dropped trainees by batch: " + batchId);
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.createAlias(GRADES, "g", JoinType.LEFT_OUTER_JOIN).add(Restrictions.eq("batch.batchId", batchId))
 				.add(Restrictions.eq(TRAINING_STATUS, TrainingStatus.Dropped))
@@ -116,7 +116,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findAllByTrainer(Integer trainerId) {
-		log.debug("Fetch all trainees by trainer: " + trainerId);
+		//log.debug("Fetch all trainees by trainer: " + trainerId);
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class).createAlias("batch", "b")
 				.createAlias("b.trainer", "t").createAlias(GRADES, "g", JoinType.LEFT_OUTER_JOIN)
 				.createAlias("notes", "n", JoinType.LEFT_OUTER_JOIN).add(Restrictions.eq("t.trainerId", trainerId))
@@ -132,7 +132,7 @@ public class TraineeDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Trainee findOne(Integer traineeId) {
-		log.debug("Fetch trainee by id: " + traineeId);
+		//log.debug("Fetch trainee by id: " + traineeId);
 		return (Trainee) sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.setFetchMode("batch", FetchMode.JOIN).setFetchMode("grades", FetchMode.JOIN)
 				.add(Restrictions.eq("traineeId", traineeId))
@@ -148,7 +148,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findByEmail(String email) {
-		log.debug(FETCH_TRAINEE + email);
+		//log.debug(FETCH_TRAINEE + email);
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.add(Restrictions.like("email", "%" + email + "%"))
 				.add(Restrictions.ne(TRAINING_STATUS, TrainingStatus.Dropped)).list();
@@ -157,7 +157,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findByName(String name) {
-		log.debug(FETCH_TRAINEE + name);
+		//log.debug(FETCH_TRAINEE + name);
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.add(Restrictions.like("name", "%" + name + "%"))
 				.add(Restrictions.ne(TRAINING_STATUS, TrainingStatus.Dropped)).list();
@@ -165,7 +165,7 @@ public class TraineeDAO {
 
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Trainee findByResourceId(String resourceId) {
-		log.debug(FETCH_TRAINEE + resourceId);
+		//log.debug(FETCH_TRAINEE + resourceId);
 		return (Trainee) sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.add(Restrictions.like("resourceId", "%" + resourceId + "%")).uniqueResult();
 	}
@@ -173,7 +173,7 @@ public class TraineeDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainee> findBySkypeId(String skypeId) {
-		log.debug(FETCH_TRAINEE + skypeId);
+		//log.debug(FETCH_TRAINEE + skypeId);
 		return sessionFactory.getCurrentSession().createCriteria(Trainee.class)
 				.add(Restrictions.like("skypeId", "%" + skypeId + "%"))
 				.add(Restrictions.ne(TRAINING_STATUS, TrainingStatus.Dropped)).list();
@@ -186,7 +186,7 @@ public class TraineeDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void delete(Trainee trainee) {
-		log.debug("Delete trainee: " + trainee);
+		//log.debug("Delete trainee: " + trainee);
 		sessionFactory.getCurrentSession().delete(trainee);
 	}
 
@@ -197,7 +197,7 @@ public class TraineeDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void update(Trainee trainee) {
-		log.info("Updating trainee " + trainee);
+		//log.info("Updating trainee " + trainee);
 		sessionFactory.getCurrentSession().saveOrUpdate(trainee);
 	}
 
