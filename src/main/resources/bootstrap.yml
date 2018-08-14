@@ -1,7 +1,10 @@
 spring:
+  aop:
+    auto: true
+    proxy-target-class: true
   application:
     name: caliber-email
   cloud:
     config:
-      uri: ${CALIBER_CONFIG_SERVER_URL}
+      uri: http://localhost:8888
       fail-fast: true
