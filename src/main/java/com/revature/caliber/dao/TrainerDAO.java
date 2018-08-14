@@ -26,7 +26,7 @@ public class TrainerDAO {
 			e.printStackTrace(); 
 		}
 	}
-	private static final Logger log = Logger.getLogger(TrainerDAO.class);
+	
 	private SessionFactory sessionFactory;
 
 	@Autowired
@@ -44,6 +44,7 @@ public class TrainerDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<String> findAllTrainerTitles() {
+		//log.debug("Get all trainer titles");
 		String hql = "select distinct title FROM Trainer";
 		return sessionFactory.getCurrentSession().createQuery(hql).list();
 	}
@@ -59,7 +60,7 @@ public class TrainerDAO {
 	public Trainer findByEmail(String email) {
 		Trainer trainer = (Trainer) sessionFactory.getCurrentSession().createCriteria(Trainer.class)
 				.add(Restrictions.eq("email", email)).uniqueResult();
-		log.debug("DAO found trainer by email " + trainer);
+		//log.debug("DAO found trainer by email " + trainer);
 		return trainer;
 	}
 
@@ -72,7 +73,7 @@ public class TrainerDAO {
 	@SuppressWarnings("unchecked")
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Trainer> findAll() {
-		log.debug("Finding all trainers");
+		//log.debug("Finding all trainers");
 		return sessionFactory.getCurrentSession().createCriteria(Trainer.class)
 				.add(Restrictions.ne("tier", TrainerRole.ROLE_INACTIVE))
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
@@ -87,7 +88,7 @@ public class TrainerDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void save(Trainer trainer) {
-		log.debug("Save trainer " + trainer);
+		//log.debug("Save trainer " + trainer);
 		sessionFactory.getCurrentSession().save(trainer);
 	}
 
@@ -99,7 +100,7 @@ public class TrainerDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Trainer findOne(Integer trainerId) {
-		log.debug("Find trainer by id: " + trainerId);
+		//log.debug("Find trainer by id: " + trainerId);
 		System.out.println("Find trainer by id: " + trainerId);
 		return sessionFactory.getCurrentSession().get(Trainer.class, trainerId);
 	}
@@ -111,7 +112,7 @@ public class TrainerDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void update(Trainer trainer) {
-		log.debug("Update trainer " + trainer);
+		//log.debug("Update trainer " + trainer);
 		sessionFactory.getCurrentSession().saveOrUpdate(trainer);
 	}
 
@@ -123,7 +124,7 @@ public class TrainerDAO {
 	 */
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void delete(Trainer trainer) {
-		log.debug("Delete trainer " + trainer);
+		//log.debug("Delete trainer " + trainer);
 		sessionFactory.getCurrentSession().delete(trainer);
 	}
 

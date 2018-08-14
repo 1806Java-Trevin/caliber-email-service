@@ -52,9 +52,8 @@ import com.revature.caliber.services.TrainingService;
  */
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-//@PreAuthorize("isAuthenticated()")
-//@CrossOrigin(origins = "http://ec2-54-163-132-124.compute-1.amazonaws.com")
-public class EmailController {
+public class EmailController { 
+	
 	@Autowired
 	private TrainingService trainingService;
 	
@@ -73,14 +72,6 @@ public class EmailController {
 	@Autowired
 	private FlagEmailService flagService;
 
-//	@Autowired
-//	private HttpServletResponse servletResponse;
-//	
-//	private void allowCrossDomainAccess() {
-//	    if (servletResponse != null) {
-//	        servletResponse.setHeader("Access-Control-Allow-Origin", "true");
-//	    }
-//	}
 	/*
 	 * email types below:
 	 * the email type maps to a template and each type is handled
@@ -118,7 +109,6 @@ public class EmailController {
 		default:
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
 	}
 	
 	/**
@@ -129,14 +119,11 @@ public class EmailController {
 	 * @param email_type a string used to determine whether to get timers from email or flag
 	 * @return	A map consisting of 2 elements, one for delay, one for interval
 	 */
-	@RequestMapping( value = "/emails/getSchedule" ,method=RequestMethod.GET)
-	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(@RequestParam("email_type") String email_type) {
+	@RequestMapping(value = "/emails/getSchedule", method = RequestMethod.GET)
+	public ResponseEntity<HashMap<String, Integer>> handleGetScheduleEmail(
+			@RequestParam("email_type") String email_type) {
 
-//		 @RequestParam("email_type") String email_type,
-//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
-		
-		
-		if(email_type == null) {
+		if (email_type == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -158,57 +145,15 @@ public class EmailController {
 		default:
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
 	}
-	
-	/**
-	 * Parses formData to schedule emails or cancel scheduled emails. Returns a bad request status
-	 * error if any member of the form is invalid, being null or otherwise.
-	 * 
-	 * If the interval given in form data is 0 or negative, the scheduled email is cancelled. 
-	 * Otherwise an email is scheduled with the initial delay and interval set.
-	 * 
-	 * @param formData A used to hold form data from an input form
-	 * @return A status code representing the result of the request
-	 */
-	//delay is in seconds?
-	//interval is in interval units?
-//	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@RequestMapping( value = "/emails/startSchedule" ,method=RequestMethod.POST, consumes = MediaType.ALL_VALUE)
-	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmail(
-			HttpServletRequest req) {
-		// 	@RequestBody MultiValueMap<String, String> formData
-		System.out.println("I reached inside handle scheudle email");
-//		 @RequestParam("email_type") String email_type,
-//			@RequestParam("delay") String delay, @RequestParam("interval") String interval,
-		
-//		for(String key: formData.keySet()) {
-//			System.out.println(formData.get(key));
-//		}
-//		
-//		String email_type = formData.getFirst("email_type");
-//		if(email_type == null) {
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-//		if(formData.getFirst("delay") == null || formData.getFirst("interval") == null ) {
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-//		int delay;
-//		int interval;
-//		try {
-//			delay = Integer.parseInt(formData.getFirst("delay"));
-//			interval = Integer.parseInt(formData.getFirst("interval"));
-//		}
-//		catch(NumberFormatException e) {
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
+
+	@RequestMapping(value = "/emails/startSchedule", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
+	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmail(HttpServletRequest req) {
+
 		JSONObject obj = getObj(req);
 		String email_type = obj.getString("email_type");
-		System.out.println(email_type);
 		int interval = obj.getInt("interval");
 		int delay = obj.getInt("delay");
-		System.out.println(email_type + " " + interval + " " + delay);
 
 		HashMap<String, Integer> map =  new HashMap<String, Integer>();
 		switch (email_type) {
@@ -253,12 +198,11 @@ public class EmailController {
 	 */
 	@RequestMapping(params= {"email_type"}, value = "/emails/send/{id}", method = RequestMethod.POST)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-//	@PreAuthorize("hasAnyRole('VP', 'TRAINER')")
-	public ResponseEntity<Void> handleEmailRequests( @PathVariable("id") int trainerId, @RequestParam("email_type") String email_type ) {
+	public ResponseEntity<Void> handleEmailRequests(@PathVariable("id") int trainerId,
+			@RequestParam("email_type") String email_type) {
 		Trainer trainerRecipient = trainingService.getTrainerById(trainerId);
-		
-		//trainerRecipient = new Trainer("haha", "title", "kevinqkh@gmail.com", TrainerRole.ROLE_QC);
-		if(trainerRecipient == null) {
+
+		if (trainerRecipient == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -281,37 +225,26 @@ public class EmailController {
 	 * reminder emails to those trainers via the handleEmailRequests method.
 	 */
 	public void runReminderEmail() {
-		System.out.println("I am sending reminder email now");
 		Set<Trainer> trainersToMail = mailer.getTrainersWhoNeedToSubmitGrades();
-		for(Trainer t: trainersToMail) {
-			System.out.println(t);
-			System.out.println(t.getEmail());
-			handleEmailRequests(t.getTrainerId(), TRAINER_GRADE_REMINDER);  // real one
-			// handleEmailRequests(99, TRAINER_GRADE_REMINDER);  // this line for testing only
+		for (Trainer t : trainersToMail) {
+			handleEmailRequests(t.getTrainerId(), TRAINER_GRADE_REMINDER);
 		}
-		//loop
-//		sendReminderEmail(trainerRecipient);
 	}
 	
 	/**
 	 * Sends email reports on flags for batches to all VPs, using the handleEmailRequests method.
 	 */
 	public void runFlagEmail() {
-		System.out.println("I am sending flag email now");
 		Set<Trainer> trainersToMail = flagMailer.getVPs();
-		for(Trainer t: trainersToMail) {
-			System.out.println(t);
-			System.out.println(t.getEmail());
-			handleEmailRequests(t.getTrainerId(), VP_BATCH_STATUS_REPORT);  // real one
-			// handleEmailRequests(99, VP_BATCH_STATUS_REPORT);  // this line for testing only
-			
+		for (Trainer t : trainersToMail) {
+			handleEmailRequests(t.getTrainerId(), VP_BATCH_STATUS_REPORT); 
 		}
 	}
 	
 	
 	/**
-	 * Sets up the properties for the sending of emails
-	 * We use gmail's SMTP server
+	 * Sets up the properties for the sending of emails; we use gmail's SMTP server
+	 * 
 	 * @return The properties for our email sending procedure
 	 */
 	private Properties getProperties() {
@@ -338,8 +271,9 @@ public class EmailController {
 	 */
 	private Message buildTrainerReminderEmail(Trainer trainerRecipient) throws IOException, MessagingException {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
-		String emailContents = new String(Files.readAllBytes(Paths.get("/Users/kevinqkh/Revature/Caliber/caliber-email-service/src/main/resources/emailTemplate.html")),StandardCharsets.UTF_8);
-
+		
+		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\emailTemplate.html")),
+				StandardCharsets.UTF_8);
 		MimeMessage message = new MimeMessage(session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
 
@@ -347,7 +281,6 @@ public class EmailController {
 
 		String emailStr = emailContents.replace("$TRAINER_NAME", trainerRecipient.getName());
 		message.setContent(emailStr, "text/html");
-
 		return message;
 	}
 	
@@ -377,8 +310,6 @@ public class EmailController {
 		emailStr = emailStr.replace("$GREEN_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.GREEN, trainees));
 		emailStr = emailStr.replace("$RED_FLAG_TRAINEES", getHTMLFlags(TraineeFlag.RED, trainees));
 		message.setContent(emailStr, "text/html");
-		
-
 		return message;
 	}
 	
@@ -413,12 +344,11 @@ public class EmailController {
 	private void sendReminderEmail(Trainer trainerToSubmitGrades) {
 		try {
 			Message email = buildTrainerReminderEmail(trainerToSubmitGrades);
-			System.out.println(email);
 			Transport.send(email);
-		}catch(IOException e) {
-			System.out.println("IOex");
-		}catch(MessagingException e) {
-			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			//unable to find html template
+		} catch (MessagingException e) {
+			//failure to send email
 		}
 	}
 	
@@ -431,12 +361,11 @@ public class EmailController {
 	private void sendStatusEmail(Trainer trainerRecipient) {
 		try {
 			Message email = buildStatusEmail(trainerRecipient);
-			System.out.println(email);
 			Transport.send(email);
-		}catch(IOException e) {
-			System.out.println("IOex");
-		}catch(MessagingException e) {
-			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			//unable to find html template
+		} catch (MessagingException e) {
+			//failure sending email
 		}
 	}
 	
@@ -448,20 +377,22 @@ public class EmailController {
 	 */
 	public JSONObject getObj(HttpServletRequest req) {
 
-        StringBuffer jb = new StringBuffer();
-        String line = null;
-        try {
-            BufferedReader reader = req.getReader();
-            while ((line = reader.readLine()) != null)
-            jb.append(line);
-        } catch (Exception e) { e.printStackTrace(); }
-             
-        JSONObject obj = null;
-        try {
-            obj = new JSONObject(jb.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return obj;
-    }
+		StringBuffer jb = new StringBuffer();
+		String line = null;
+		try {
+			BufferedReader reader = req.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+		} catch (Exception e) {
+			//failure to build StringBuffer
+		}
+
+		JSONObject obj = null;
+		try {
+			obj = new JSONObject(jb.toString());
+		} catch (Exception e) {
+			//failure to marshal StringBuffer
+		}
+		return obj;
+	}
 }
