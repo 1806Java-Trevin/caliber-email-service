@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -158,6 +159,47 @@ public class EmailController {
 		System.out.println(email_type);
 		int interval = obj.getInt("interval");
 		int delay = obj.getInt("delay");
+		System.out.println(email_type + " " + interval + " " + delay);
+
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		switch (email_type) {
+		case TRAINER_GRADE_REMINDER:
+			if (interval <= 0) {
+				emailService.cancelMail();
+			} else {
+				emailService.startReminderJob(delay, interval);
+			}
+			map.put("delay", emailService.getDelay());
+			map.put("interval", emailService.getInterval());
+			break;
+		case VP_BATCH_STATUS_REPORT:
+			if (interval <= 0) {
+				flagService.cancelMail();
+			} else {
+				flagService.startReminderJob(delay, interval);
+			}
+			map.put("delay", flagService.getDelay());
+			map.put("interval", flagService.getInterval());
+			break;
+		default:
+			return new ResponseEntity<HashMap<String, Integer>>(HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<HashMap<String, Integer>>(map, HttpStatus.CREATED);
+	}
+	
+	@RequestMapping(value = "/emails/startScheduleForm", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<HashMap<String, Integer>> handleScheduleEmailForm(@RequestParam Map<String,String> req) {
+		// @RequestBody MultiValueMap<String, String> formData
+		System.out.println("I reached inside handle scheudle email form");
+
+		if( !req.containsKey("email_type") || !req.containsKey("delay") || !req.containsKey("interval")  ) {
+			return new ResponseEntity<HashMap<String, Integer>>(HttpStatus.BAD_REQUEST);
+		}
+		
+		String email_type = req.get("email_type");
+		System.out.println(email_type);
+		int interval = Integer.parseInt(req.get("interval"));
+		int delay = Integer.parseInt(req.get("delay"));
 		System.out.println(email_type + " " + interval + " " + delay);
 
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
