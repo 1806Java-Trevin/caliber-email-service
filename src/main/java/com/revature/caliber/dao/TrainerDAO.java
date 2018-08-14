@@ -1,8 +1,6 @@
 package com.revature.caliber.dao;
 
 import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -21,7 +19,6 @@ public class TrainerDAO {
 	static {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			System.out.println("Initializing Oracle Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace(); 
 		}

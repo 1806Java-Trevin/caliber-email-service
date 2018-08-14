@@ -132,15 +132,11 @@ public class EmailController {
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		switch (email_type) {
 		case TRAINER_GRADE_REMINDER:
-			
 			map.put("delay",  emailService.getDelay());
-
 			map.put("interval", emailService.getInterval());
 			return new ResponseEntity<>(map, HttpStatus.CREATED);
 		case VP_BATCH_STATUS_REPORT:
-
 			map.put("delay",  flagService.getDelay());
-
 			map.put("interval", flagService.getInterval());
 			return new ResponseEntity<>(map, HttpStatus.CREATED);
 		default:
