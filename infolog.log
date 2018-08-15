@@ -15,3 +15,4 @@ WARN    2018-08-14 14:26:16,913 [restartedMain] org.hibernate.orm.deprecation  -
 WARN    2018-08-14 14:26:16,913 [restartedMain] org.hibernate.orm.deprecation  - HHH90000014: Found use of deprecated [org.hibernate.id.SequenceHiLoGenerator] sequence-based id generator; use org.hibernate.id.enhanced.SequenceStyleGenerator instead.  See Hibernate Domain Model Mapping Guide for details.
 WARN    2018-08-14 14:26:16,913 [restartedMain] org.hibernate.orm.deprecation  - HHH90000014: Found use of deprecated [org.hibernate.id.SequenceHiLoGenerator] sequence-based id generator; use org.hibernate.id.enhanced.SequenceStyleGenerator instead.  See Hibernate Domain Model Mapping Guide for details.
 INFO    2018-08-14 14:26:35,740 [http-nio-9001-exec-2] com.revature.caliber.email.FlagAlertMailer  - Getting VP's from trainer's table
+INFO    2018-08-15 15:18:25,580 [background-preinit] org.hibernate.validator.internal.util.Version  - HV000001: Hibernate Validator 5.3.6.Final

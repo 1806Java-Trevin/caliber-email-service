@@ -134,10 +134,8 @@ public class Logging {
 	@AfterReturning("execution(* com.revature.caliber.dao.BatchDAO.findAllCurrent(..))")
 	public void BatchDAOFindAllCurrent(JoinPoint point)
 	{
-		Object [] argList;
-		argList = point.getArgs();
-		Integer trainerId = (Integer) argList[0];
-		BatchDAOlog.debug("Fetching all current batches for trainer: " + trainerId);
+		
+		BatchDAOlog.debug("Fetching all current batches");
 	}
 	
 	@AfterReturning("execution(* com.revature.caliber.dao.BatchDAO.findAllCurrentWithNotesAndTrainees(..))")
@@ -432,7 +430,7 @@ public class Logging {
 	{
 		Object [] argList;
 		argList = point.getArgs();
-		Trainer trainer = (Trainer) argList[0];
+		String trainer = (String) argList[0];
 		TrainerDAOlog.debug("DAO found trainer by email " + trainer);
 	}
 	
