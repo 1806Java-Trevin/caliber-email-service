@@ -2,6 +2,8 @@ package com.revature.caliber.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,6 +21,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -340,10 +343,15 @@ public class EmailController {
 		System.out.println(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html" );
 //		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\emailTemplate.html")),
 //				StandardCharsets.UTF_8);
-//		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html")),
-//				StandardCharsets.UTF_8);
-		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "src/main/resources/emailTemplate.html")),
+		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/emailTemplate.html")),
 				StandardCharsets.UTF_8);
+//		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "src/main/resources/emailTemplate.html")),
+//				StandardCharsets.UTF_8);
+		
+		InputStream stream = getClass().getResourceAsStream("../../../../emailTemplate.html");
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(stream, writer, "UTF-8");
+		emailContents = writer.toString();
 		
 
 		System.out.println(emailContents);
@@ -373,9 +381,14 @@ public class EmailController {
 		Session session = Session.getDefaultInstance(getProperties(), authenticator);
 		System.out.println(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html" );
 //		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "\\src\\main\\resources\\flagEmailTemplate.html")),StandardCharsets.UTF_8);
-//		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
-		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
+		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
+//		String emailContents = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "src/main/resources/flagEmailTemplate.html")),StandardCharsets.UTF_8);
 
+		InputStream stream = getClass().getResourceAsStream("../../../../flagEmailTemplate.html");
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(stream, writer, "UTF-8");
+		emailContents = writer.toString();
+		
 		System.out.println(emailContents);
 		MimeMessage message = new MimeMessage(session);
 		message.addRecipient(Message.RecipientType.TO, new InternetAddress(trainerRecipient.getEmail()));
