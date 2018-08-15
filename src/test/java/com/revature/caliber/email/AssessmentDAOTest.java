@@ -46,6 +46,12 @@ public class AssessmentDAOTest {
 	
 	@Test
 	@Transactional
+	public void findByWeekTest() {
+		assertNotEquals(0,aDao.findByWeek(2201, 7));
+	}
+	
+	@Test
+	@Transactional
 	public void getAllAssessmentsTest() {
 		assertNotEquals(0, aDao.findAll().size());
 	}
