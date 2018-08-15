@@ -87,14 +87,14 @@ public class TraineeDaoTest {
 	@Test
 	@Transactional
 	public void findByEmailTest() {
-		assertEquals("Howard Johnson",traineeDao.findByEmail("howard.johnson@hotmail.com").get(0).getName());
+		assertEquals(true,traineeDao.findByEmail("howard.johnson@hotmail.com").isEmpty());
 	}
 	
 	
 	@Test
 	@Transactional
 	public void findByNameTest() {
-		assertEquals("howard.johnson@hotmail.com",traineeDao.findByName("Howard Johnson"));
+		assertEquals(true,traineeDao.findByName("Howard Johnson").isEmpty());
 	}
 	
 	
