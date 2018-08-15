@@ -50,8 +50,10 @@ public class FlagEmailService implements InitializingBean {
 		}
 		
 		public void cancelMail() {
-			mailHandle.cancel(true);
-			mailInterval = 0;
+			if( mailHandle != null ) {
+				mailHandle.cancel(true);
+				mailInterval = 0;
+			}
 		}
 		
 		public int  getDelay() {
