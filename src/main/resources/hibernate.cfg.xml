@@ -1,0 +1,46 @@
+<hibernate-configuration>
+        <session-factory>
+<!--         	JDBC API stuff -->
+        	<property name="hibernate.connection.username">JuneBestBatch</property>
+       		<property name="hibernate.connection.password">p4ssw0rd</property>
+       		<property name="hibernate.connection.url">jdbc:oracle:thin:@wvudatabase.czc0zuhxihvw.us-east-1.rds.amazonaws.com:1521:orcl</property>
+       		<property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+<!-- 			Additional Hibernate awesomeness -->
+			<property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+			<property name="hibernate.show_sql">false</property>
+			<property name="hibernate.format_sql">false</property>
+			
+<!-- 			create    drops all existing tables and adds your schema -->
+<!-- 			validate   just checks to makes sure the schema is as expected -->
+<!-- 			update   it will not delete, only add to your schema -->
+<!-- 			none     well.....it means it it won't do anything automatically -->
+			<property name="hibernate.hbm2ddl.auto">validate</property>
+			
+			<mapping class="com.revature.caliber.beans.Assessment"/>
+			<mapping class="com.revature.caliber.beans.Grade"/>
+			<mapping class="com.revature.caliber.beans.Batch"/>
+			<mapping class="com.revature.caliber.beans.Category"/>
+			<mapping class="com.revature.caliber.beans.Trainee"/>
+			<mapping class="com.revature.caliber.beans.Address"/>
+			<mapping class="com.revature.caliber.beans.AssessmentType"/>
+			<mapping class="com.revature.caliber.beans.InterviewFormat"/>
+			<mapping class="com.revature.caliber.beans.LocationStatus"/>
+			<mapping class="com.revature.caliber.beans.Note"/>
+			<mapping class="com.revature.caliber.beans.NoteType"/>
+			<mapping class="com.revature.caliber.beans.Panel"/>
+			<mapping class="com.revature.caliber.beans.PanelFeedback"/>
+			<mapping class="com.revature.caliber.beans.PanelStatus"/>
+			<mapping class="com.revature.caliber.beans.QCStatus"/>
+			<mapping class="com.revature.caliber.beans.RecordingConsent"/>
+			<mapping class="com.revature.caliber.beans.SkillType"/>
+			<mapping class="com.revature.caliber.beans.Trainer"/>
+			<mapping class="com.revature.caliber.beans.TrainerRole"/>
+			<mapping class="com.revature.caliber.beans.TrainerTask"/>
+			<mapping class="com.revature.caliber.beans.TrainerTaskCompletion"/>
+			<mapping class="com.revature.caliber.beans.TrainingStatus"/>
+			<mapping class="com.revature.caliber.beans.TrainingType"/>
+			
+<!-- 				used for the mapping file (hbm.xml) -->
+<!-- 			<mapping resource="Character.hbm.xml"/> -->
+        </session-factory>
+</hibernate-configuration>
