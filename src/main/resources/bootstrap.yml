@@ -1,4 +1,7 @@
 spring:
+  h2:
+    console:
+      enabled: true
   aop:
     auto: true
     proxy-target-class: true
