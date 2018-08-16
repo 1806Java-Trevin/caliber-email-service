@@ -97,8 +97,10 @@ public class TraineeDaoTest {
 		assertEquals(true,traineeDao.findByName("Howard Johnson").isEmpty());
 	}
 	
-	
-	
-	
+	@Test
+	@Transactional
+	public void findByResourceTest() {
+		assertEquals("kchangfatt@gmail.com",traineeDao.findByResourceId("abcdef1234").getEmail());
+	}
 
 }
